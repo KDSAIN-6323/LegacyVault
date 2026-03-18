@@ -129,9 +129,15 @@ object NetworkModule {
 
     // ── API services ────────────────────────────────────────────────────────
 
+    // Unqualified binding consumed by use-cases (LoginUseCase, LogoutUseCase, etc.)
     @Provides @Singleton
     fun provideAuthApiService(@Named("auth") retrofit: Retrofit): AuthApiService =
         retrofit.create(AuthApiService::class.java)
+
+    // Qualified alias consumed by TokenRefreshAuthenticator via Provider<> to
+    // make the DI graph's auth-client chain explicit.
+    @Provides @Singleton @Named("auth")
+    fun provideNamedAuthApiService(service: AuthApiService): AuthApiService = service
 
     @Provides @Singleton
     fun provideCategoriesApiService(@Named("main") retrofit: Retrofit): CategoriesApiService =

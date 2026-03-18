@@ -52,9 +52,10 @@ data class CreatePageRequest(
 
 @Serializable
 data class UpdatePageRequest(
-    val title: String,
-    val content: String,
-    val encryptionIV: String? = null
+    val title: String? = null,
+    val content: String? = null,
+    val encryptionIV: String? = null,
+    val sortOrder: Int? = null
 )
 
 @Serializable

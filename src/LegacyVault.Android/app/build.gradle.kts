@@ -115,6 +115,7 @@ dependencies {
     testRuntimeOnly(libs.junit5.engine)
     testImplementation(libs.mockk)
     testImplementation(libs.coroutines.test)
+    testImplementation(libs.okhttp.mockwebserver)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.compose.ui.test.junit4)

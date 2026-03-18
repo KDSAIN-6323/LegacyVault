@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Background plate -->
+  <rect width="48" height="48" rx="9" fill="#13131f"/>
+
+  <!-- Outer vault ring -->
+  <circle cx="24" cy="24" r="16.5" stroke="#7c3aed" stroke-width="2.5"/>
+
+  <!-- Four locking bolts at cardinal positions -->
+  <circle cx="24"  cy="5.5" r="3"   fill="#7c3aed"/>
+  <circle cx="42.5" cy="24" r="3"   fill="#7c3aed"/>
+  <circle cx="24"  cy="42.5" r="3"  fill="#7c3aed"/>
+  <circle cx="5.5"  cy="24" r="3"   fill="#7c3aed"/>
+
+  <!-- Inner combination-dial ring -->
+  <circle cx="24" cy="24" r="9" stroke="#7c3aed" stroke-width="1.8"/>
+
+  <!-- Center hub -->
+  <circle cx="24" cy="24" r="3.5" fill="#7c3aed"/>
+
+  <!-- Dial indicator (points to ~2 o'clock — partially opened) -->
+  <line x1="24" y1="24" x2="30.5" y2="20.2" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

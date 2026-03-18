@@ -1,0 +1,135 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   LegacyVault Theme System
+   All color tokens live here. Layout/size tokens stay in AppShell.css.
+   WCAG AA: normal text ≥4.5:1, large text / UI components ≥3:1.
+───────────────────────────────────────────────────────────────────────── */
+
+/* ── Dark theme (default) ─────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Panel backgrounds */
+  --color-sidebar-bg:   #1e1e2e;
+  --color-pagelist-bg:  #2a2a3e;
+  --color-content-bg:   #1e1e2e;
+  --color-card-bg:      #24273a;  /* floating cards: login, encryption */
+
+  /* Text — all contrast-checked against their expected backgrounds */
+  --color-text:         #cdd6f4;  /* #cdd6f4 on #1e1e2e  ≈ 9.8:1  ✓ */
+  --color-heading:      #e6e9f2;  /* stronger headings   ≈ 12.5:1 ✓ */
+  --color-sidebar-text: #cdd6f4;  /* panel text          ≈ 9.8:1  ✓ */
+  --color-text-muted:   #9399b2;  /* #9399b2 on #1e1e2e  ≈ 5.4:1  ✓ */
+  --color-placeholder:  #6c7086;
+
+  /* Accent */
+  --color-accent:       #89b4fa;  /* #89b4fa on #1e1e2e  ≈ 5.5:1  ✓ */
+  --color-accent-hover: #74c7ec;
+  --color-accent-on:    #1e1e2e;  /* text placed ON an accent-coloured button */
+
+  /* Borders */
+  --color-border:         #313244;
+  --color-content-border: #3d3f5c;  /* borders inside content area */
+
+  /* Inputs (inside content area) */
+  --color-input-bg:     rgba(255,255,255,0.05);
+  --color-input-border: #45475a;
+
+  /* Save / ghost buttons in content area */
+  --color-btn-bg:     rgba(255,255,255,0.06);
+  --color-btn-border: #45475a;
+  --color-btn-text:   #cdd6f4;
+
+  /* Note editor toolbar */
+  --color-toolbar-btn-bg:          rgba(255,255,255,0.06);
+  --color-toolbar-btn-text:        #cdd6f4;
+  --color-toolbar-active-bg:       rgba(137,180,250,0.22);
+  --color-toolbar-active-border:   #89b4fa;
+  --color-toolbar-active-text:     #89b4fa;
+  --color-toolbar-divider:         #3d3f5c;
+
+  /* Hover tints */
+  --color-item-hover:    rgba(255,255,255,0.05);
+  --color-accent-subtle: rgba(137,180,250,0.10);
+
+  /* Tags (quote editor) */
+  --color-tag-bg:     rgba(137,180,250,0.18);
+  --color-tag-text:   #89b4fa;
+  --color-tag-border: rgba(137,180,250,0.40);
+
+  /* Semantic */
+  --color-error:      #f38ba8;
+  --color-overlay:    rgba(0,0,0,0.60);
+  --color-shadow:     rgba(0,0,0,0.50);
+
+  /* Login page gradient */
+  --color-login-from: #1e1e2e;
+  --color-login-to:   #2a2a3e;
+}
+
+/* ── Light theme ──────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Panel backgrounds — sidebars stay dark for visual hierarchy */
+  --color-sidebar-bg:   #1e2a45;
+  --color-pagelist-bg:  #283452;
+  --color-content-bg:   #ffffff;
+  --color-card-bg:      #ffffff;
+
+  /* Text */
+  --color-text:         #1f2937;  /* #1f2937 on #ffffff   ≈ 16.1:1 ✓ */
+  --color-heading:      #111827;  /* #111827 on #ffffff   ≈ 20.6:1 ✓ */
+  --color-sidebar-text: #e2e8f0;  /* #e2e8f0 on #1e2a45   ≈ 10.2:1 ✓ */
+  --color-text-muted:   #6b7280;  /* #6b7280 on #ffffff   ≈  4.6:1 ✓ */
+  --color-placeholder:  #9ca3af;
+
+  /* Accent — darker blue so text ON accent buttons can be white */
+  --color-accent:       #2563eb;  /* #2563eb on #ffffff   ≈  5.0:1 ✓ */
+  --color-accent-hover: #1d4ed8;
+  --color-accent-on:    #ffffff;  /* white text on blue button ✓ */
+
+  /* Borders */
+  --color-border:         #2d3d60;   /* panel borders on dark sidebar */
+  --color-content-border: #e5e7eb;   /* borders inside light content area */
+
+  /* Inputs (inside content area) */
+  --color-input-bg:     #ffffff;
+  --color-input-border: #d1d5db;
+
+  /* Save / ghost buttons in content area */
+  --color-btn-bg:     #f9fafb;
+  --color-btn-border: #d1d5db;
+  --color-btn-text:   #374151;
+
+  /* Note editor toolbar */
+  --color-toolbar-btn-bg:        #f3f4f6;
+  --color-toolbar-btn-text:      #374151;
+  --color-toolbar-active-bg:     #dbeafe;
+  --color-toolbar-active-border: #93c5fd;
+  --color-toolbar-active-text:   #1d4ed8;
+  --color-toolbar-divider:       #e5e7eb;
+
+  /* Hover tints */
+  --color-item-hover:    rgba(0,0,0,0.05);
+  --color-accent-subtle: rgba(37,99,235,0.10);
+
+  /* Tags (quote editor) */
+  --color-tag-bg:     #dbeafe;
+  --color-tag-text:   #1d4ed8;
+  --color-tag-border: #93c5fd;
+
+  /* Semantic */
+  --color-error:      #dc2626;
+  --color-overlay:    rgba(0,0,0,0.40);
+  --color-shadow:     rgba(0,0,0,0.15);
+
+  /* Login page gradient */
+  --color-login-from: #1e2a45;
+  --color-login-to:   #283452;
+}
+
+/* ── Font size scale (all rem units scale proportionally) ─────────────── */
+[data-fontsize="small"]  { font-size: 13px; }
+[data-fontsize="medium"] { font-size: 16px; }
+[data-fontsize="large"]  { font-size: 19px; }

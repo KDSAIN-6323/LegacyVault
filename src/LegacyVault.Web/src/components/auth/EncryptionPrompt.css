@@ -1,0 +1,61 @@
+.encryption-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--color-content-bg);
+}
+
+.encryption-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-content-border);
+  border-radius: 12px;
+  padding: 40px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 24px var(--color-shadow);
+}
+
+.encryption-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.encryption-card h2 { font-size: 1.25rem; margin-bottom: 8px; color: var(--color-heading); }
+.encryption-card p { color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 24px; }
+
+.encryption-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.encryption-card input {
+  padding: 10px 14px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  text-align: center;
+  letter-spacing: 0.1em;
+  background: var(--color-input-bg);
+  color: var(--color-text);
+}
+
+.encryption-card input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+.encryption-card button {
+  padding: 10px;
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.encryption-card button:disabled { opacity: 0.6; cursor: not-allowed; }
+.encryption-error { color: var(--color-error); font-size: 0.875rem; margin: 0; }
+.encryption-hint { font-size: 0.8rem; color: var(--color-text-muted); font-style: italic; margin: 0; text-align: left; }
+.encryption-note { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 16px; margin-bottom: 0; }

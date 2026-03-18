@@ -1,0 +1,8 @@
+# Development overrides — automatically merged with docker-compose.yml
+# Exposes the API port directly for Swagger access during development
+services:
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5000:5000"  # Swagger UI at http://localhost:5000/swagger

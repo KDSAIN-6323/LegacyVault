@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find z:/Source/LegacyVault/src/LegacyVault.Mobile/app -name *.tsx -o -name *.ts)",
+      "Bash(find z:/Source/LegacyVault/src/LegacyVault.Web/src -name *.tsx -o -name *.ts)",
+      "Bash(cmd /c \"cd /d z:\\\\Source\\\\LegacyVault\\\\src\\\\LegacyVault.Web && node_modules\\\\.bin\\\\tsc -b && echo TSC_OK && node_modules\\\\.bin\\\\vite build && echo VITE_OK\")",
+      "Bash(powershell -Command \"cd ''z:\\\\Source\\\\LegacyVault\\\\src\\\\LegacyVault.Web''; & node_modules\\\\.bin\\\\tsc -b 2>&1; Write-Host \"\"TSC exit: $LASTEXITCODE\"\"; & node_modules\\\\.bin\\\\vite build 2>&1; Write-Host \"\"VITE exit: $LASTEXITCODE\"\"\")",
+      "Bash(cmd /c \"cd /d z:\\\\Source\\\\LegacyVault\\\\src\\\\LegacyVault.Web && node node_modules\\\\typescript\\\\bin\\\\tsc -b 2>&1 && echo TSC_PASS || echo TSC_FAIL\")",
+      "Bash(cmd /c \"cd /d z:\\\\Source\\\\LegacyVault\\\\src\\\\LegacyVault.Web && node node_modules\\\\typescript\\\\bin\\\\tsc -b 1>z:\\\\tsc_out.txt 2>&1\")",
+      "Bash(echo \"exit:$?\")",
+      "Bash(cmd /c \"cd /d z:\\\\Source\\\\LegacyVault\\\\src\\\\LegacyVault.Web && node node_modules\\\\typescript\\\\bin\\\\tsc -b 1>C:\\\\Users\\\\MCVD-TX\\\\tsc_out.txt 2>&1 && echo TSC_PASS || echo TSC_FAIL\")",
+      "Bash(cmd /c \"cd /d z:\\\\Source\\\\LegacyVault\\\\src\\\\LegacyVault.Web && node node_modules\\\\vite\\\\bin\\\\vite.js build 1>C:\\\\Users\\\\MCVD-TX\\\\vite_out.txt 2>&1 && echo VITE_PASS || echo VITE_FAIL\")",
+      "Bash(cmd /c \"cd /d z:\\\\Source\\\\LegacyVault\\\\src\\\\LegacyVault.Web && node node_modules\\\\typescript\\\\bin\\\\tsc -b 1>z:\\\\Source\\\\tsc_out.txt 2>&1 && echo PASS\")"
+    ]
+  }
+}

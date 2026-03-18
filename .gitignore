@@ -1,0 +1,31 @@
+# Environment secrets — NEVER commit
+.env
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.db
+*.db-shm
+*.db-wal
+
+# Node
+node_modules/
+dist/
+.vite/
+*.local
+
+# Build output
+publish/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local dev database
+src/LegacyVault.API/data/
+
+# Uploads (user data)
+src/LegacyVault.API/uploads/

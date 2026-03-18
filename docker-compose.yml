@@ -1,0 +1,48 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/LegacyVault.API/Dockerfile
+    container_name: legacyvault_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - JwtSettings__Secret=${JWT_SECRET}
+      - JwtSettings__Issuer=LegacyVault
+      - JwtSettings__Audience=LegacyVaultClients
+      - JwtSettings__AccessTokenExpiryMinutes=15
+      - JwtSettings__RefreshTokenExpiryDays=30
+    volumes:
+      - legacyvault_db:/app/data
+      - ${VAULT_UPLOADS_PATH}:/app/uploads
+      - ${VAULT_BACKUPS_PATH}:/app/backups
+    networks:
+      - legacyvault_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/api/auth/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    build:
+      context: src/LegacyVault.Web
+      dockerfile: Dockerfile
+    container_name: legacyvault_web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+    networks:
+      - legacyvault_net
+    restart: unless-stopped
+
+volumes:
+  legacyvault_db:
+    name: legacyvault_db
+
+networks:
+  legacyvault_net:
+    name: legacyvault_net

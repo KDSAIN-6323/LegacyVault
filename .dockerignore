@@ -1,0 +1,30 @@
+# Node — critical: exclude node_modules from API build context
+**/node_modules
+**/dist
+**/.vite
+
+# .NET build artifacts
+**/bin
+**/obj
+
+# Expo/mobile
+src/LegacyVault.Mobile/
+
+# Git and IDE
+.git
+.vs
+.vscode
+*.user
+
+# Secrets
+.env
+
+# Data files
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/uploads/
+
+# Docs
+docs/
+*.md

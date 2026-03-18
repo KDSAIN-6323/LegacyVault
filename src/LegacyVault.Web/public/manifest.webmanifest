@@ -1,0 +1,17 @@
+{
+  "name": "Legacy Vault",
+  "short_name": "LegacyVault",
+  "description": "Your personal knowledge vault",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#13131f",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

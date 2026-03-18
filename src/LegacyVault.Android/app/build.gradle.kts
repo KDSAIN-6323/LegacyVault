@@ -103,6 +103,9 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.security.crypto)
 
+    // Material (XML theme for Activity window — required for Theme.Material3.DayNight)
+    implementation(libs.material)
+
     // Images
     implementation(libs.coil.compose)
 

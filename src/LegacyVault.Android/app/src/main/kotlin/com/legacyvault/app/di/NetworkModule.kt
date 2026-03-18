@@ -1,6 +1,6 @@
 package com.legacyvault.app.di
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.legacyvault.app.data.local.preferences.UserPreferencesDataStore
 import com.legacyvault.app.data.remote.api.AttachmentsApiService
 import com.legacyvault.app.data.remote.api.AuthApiService

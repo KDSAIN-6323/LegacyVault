@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -14,17 +13,22 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.legacyvault.app.ui.auth.StartupViewModel
+import androidx.navigation.navArgument
 import com.legacyvault.app.data.remote.network.TokenStore
+import com.legacyvault.app.domain.model.enums.PageType
 import com.legacyvault.app.ui.auth.ApiUrlScreen
 import com.legacyvault.app.ui.auth.AuthViewModel
 import com.legacyvault.app.ui.auth.LoginScreen
 import com.legacyvault.app.ui.auth.RegisterScreen
 import com.legacyvault.app.ui.auth.ResetPasswordScreen
 import com.legacyvault.app.ui.auth.StartupViewModel
+import com.legacyvault.app.ui.categories.CategoryListScreen
+import com.legacyvault.app.ui.pages.PageListScreen
+import com.legacyvault.app.ui.pages.detail.PageDetailScreen
 import com.legacyvault.app.ui.vault.VaultUnlockScreen
 
 /**
@@ -77,12 +81,12 @@ fun AppNavGraph(
         // ── Login ─────────────────────────────────────────────────────────
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginSuccess       = {
+                onLoginSuccess            = {
                     navController.navigate(Routes.CATEGORY_LIST) {
                         popUpTo(Routes.LOGIN) { inclusive = true }
                     }
                 },
-                onNavigateToRegister = { navController.navigate(Routes.REGISTER) },
+                onNavigateToRegister      = { navController.navigate(Routes.REGISTER) },
                 onNavigateToResetPassword = { navController.navigate(Routes.RESET_PW) }
             )
         }
@@ -108,10 +112,13 @@ fun AppNavGraph(
         }
 
         // ── Vault unlock ──────────────────────────────────────────────────
-        composable(Routes.VAULT_UNLOCK) { backStackEntry ->
+        composable(
+            route     = Routes.VAULT_UNLOCK,
+            arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
             VaultUnlockScreen(
                 onUnlocked = {
-                    val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
                     navController.navigate(Routes.pageList(categoryId)) {
                         popUpTo(Routes.VAULT_UNLOCK) { inclusive = true }
                     }
@@ -120,28 +127,74 @@ fun AppNavGraph(
             )
         }
 
-        // ── Main — Categories ─────────────────────────────────────────────
+        // ── Categories (Vaults) ───────────────────────────────────────────
         composable(Routes.CATEGORY_LIST) {
-            PlaceholderScreen("Vaults")
-        }
-        composable(Routes.CATEGORY_CREATE) {
-            PlaceholderScreen("Create Vault")
+            CategoryListScreen(
+                onCategoryClick = { category, isUnlocked ->
+                    if (category.isEncrypted && !isUnlocked) {
+                        navController.navigate(Routes.vaultUnlock(category.id))
+                    } else {
+                        navController.navigate(Routes.pageList(category.id))
+                    }
+                },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Routes.CATEGORY_LIST) { saveState = true }
+                        launchSingleTop = true
+                        restoreState    = true
+                    }
+                }
+            )
         }
 
-        // ── Main — Pages ──────────────────────────────────────────────────
-        composable(Routes.PAGE_LIST) { backStackEntry ->
+        // ── Page list ─────────────────────────────────────────────────────
+        composable(
+            route     = Routes.PAGE_LIST,
+            arguments = listOf(navArgument("categoryId") { type = NavType.StringType })
+        ) { backStackEntry ->
             val categoryId = backStackEntry.arguments?.getString("categoryId") ?: ""
-            PlaceholderScreen("Pages — $categoryId")
-        }
-        composable(Routes.PAGE_DETAIL) { backStackEntry ->
-            val pageId = backStackEntry.arguments?.getString("pageId") ?: ""
-            PlaceholderScreen("Page Detail — $pageId")
-        }
-        composable(Routes.PAGE_CREATE) {
-            PlaceholderScreen("New Page")
+            PageListScreen(
+                onPageClick   = { pageId ->
+                    navController.navigate(Routes.pageDetail(categoryId, pageId))
+                },
+                onCreatePage  = { pageType: PageType ->
+                    navController.navigate(Routes.pageCreate(categoryId, pageType.name))
+                },
+                onBack        = { navController.popBackStack() }
+            )
         }
 
-        // ── Main — Top-level ─────────────────────────────────────────────
+        // ── Page detail (edit) ────────────────────────────────────────────
+        composable(
+            route     = Routes.PAGE_DETAIL,
+            arguments = listOf(
+                navArgument("categoryId") { type = NavType.StringType },
+                navArgument("pageId")     { type = NavType.StringType }
+            )
+        ) {
+            PageDetailScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // ── Page create ───────────────────────────────────────────────────
+        composable(
+            route     = Routes.PAGE_CREATE,
+            arguments = listOf(
+                navArgument("categoryId") { type = NavType.StringType },
+                navArgument("pageType")   {
+                    type             = NavType.StringType
+                    defaultValue     = ""
+                    nullable         = true
+                }
+            )
+        ) {
+            PageDetailScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // ── Top-level destinations (bottom nav placeholders) ──────────────
         composable(Routes.SEARCH)    { PlaceholderScreen("Search") }
         composable(Routes.REMINDERS) { PlaceholderScreen("Reminders") }
         composable(Routes.SHOPPING)  { PlaceholderScreen("Shopping Lists") }
@@ -156,8 +209,7 @@ fun AppNavGraph(
         composable(Routes.BACKUP) { PlaceholderScreen("Backup & Restore") }
     }
 
-    // Global logout observer — any screen can trigger navigation back to Login
-    // by watching TokenStore via AuthViewModel injected at the graph level.
+    // Global logout observer — any screen triggers navigation back to Login
     val authVm: AuthViewModel = hiltViewModel()
     val authState by authVm.authState.collectAsStateWithLifecycle()
 
@@ -177,13 +229,13 @@ fun AppNavGraph(
 private fun PlaceholderScreen(name: String) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color    = MaterialTheme.colorScheme.background
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+            modifier         = Modifier.fillMaxSize()
         ) {
-            Text(
+            androidx.compose.material3.Text(
                 text  = name,
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground

@@ -29,7 +29,7 @@ object Routes {
     // Pages
     const val PAGE_LIST    = "main/categories/{categoryId}/pages"
     const val PAGE_DETAIL  = "main/categories/{categoryId}/pages/{pageId}"
-    const val PAGE_CREATE  = "main/categories/{categoryId}/pages/create"
+    const val PAGE_CREATE  = "main/categories/{categoryId}/pages/create?pageType={pageType}"
 
     // Top-level destinations (bottom nav)
     const val SEARCH       = "main/search"
@@ -45,5 +45,6 @@ object Routes {
     fun pageList(categoryId: String)  = "main/categories/$categoryId/pages"
     fun pageDetail(categoryId: String, pageId: String) =
         "main/categories/$categoryId/pages/$pageId"
-    fun pageCreate(categoryId: String) = "main/categories/$categoryId/pages/create"
+    fun pageCreate(categoryId: String, pageType: String = "") =
+        "main/categories/$categoryId/pages/create?pageType=$pageType"
 }

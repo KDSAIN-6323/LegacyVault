@@ -58,6 +58,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `InactivityManager`: coroutine timer driven by DataStore timeout setting; evicts all vault keys and logs out on expiry; reset on every pointer event via `pointerInteropFilter` in `MainActivity`
 - Global logout observer in `AppNavGraph`: any `Unauthenticated` emission redirects to Login from any screen
 
+**Core app — Categories, Pages, Editors (Phase 7)**
+- `PageContentJson`: `parsePageContent(json, type)` / `serializePageContent(content)` / `defaultContent(type)` utilities using a shared lenient `Json` instance
+- `CategoryListViewModel` + `CategoryListScreen`: `PullToRefreshBox` vault list; lock/unlock icon indicator per card; FAB → create sheet; long-press / MoreVert dropdown (Edit, Favorite, Lock, Delete)
+- `CategoryCreateEditSheet`: `ModalBottomSheet`; type chips (General / Vault) hidden on edit; vault password + hint fields shown conditionally; generates PBKDF2 salt inline for new vaults
+- `PageListViewModel` + `PageListScreen`: pulls `categoryId` from `SavedStateHandle`; observes pages + category from Room; pull-to-refresh; FAB → `PageTypePickerSheet`; per-page dropdown (Favorite, Delete)
+- `PageTypePickerSheet`: `ModalBottomSheet` listing all 7 `PageType` entries with icon + label
+- `PageDetailViewModel` + `PageDetailScreen`: create mode (from `pageType` arg) and edit mode (decrypt-on-load, encrypt-on-save); discard confirmation `BackHandler`; lock-state message; save checkmark
+- 7 page type editors:
+  - `NoteEditor`: transparent-border `OutlinedTextField`, `heightIn(min=300dp)`
+  - `PasswordEditor`: URL, username (copy), password (visibility + copy + generate), strength `LinearProgressIndicator`, TOTP, notes
+  - `QuoteEditor`: text, author, source; `ImeAction.Done` tag input with `FlowRow` chip list
+  - `HomeInventoryEditor`: item name, description, location, value (decimal keyboard), purchase/warranty dates, serial number
+  - `RecipeEditor`: servings + prep/cook time row; ingredient and step lists with add-via-keyboard-done + remove; notes
+  - `ReminderEditor`: date / end date; `FilterChip` tag and recurrence selectors; `Switch` for notifications; notify-before quantity + unit chips
+  - `ShoppingListEditor`: item + quantity add row; `Checkbox` toggle per item; remove button; notes
+- `MainBottomBar`: `NavigationBar` with 4 destinations — Vaults, Search, Reminders, Shopping
+- `AppNavGraph` fully wired: all placeholder screens replaced; `PAGE_CREATE` route includes `?pageType=` query param; `navArgument` declarations for all parameterised routes
+- `Routes.pageCreate(categoryId, pageType)` updated to pass `pageType` as query param
+
+### Fixed — Android
+- `gradle.properties`: added `android.useAndroidX=true` (required for AndroidX dependency resolution) and `android.suppressUnsupportedCompileSdk=35`
+- Added `com.google.android.material:material:1.12.0` dependency for `Theme.Material3.DayNight.NoActionBar` XML theme used by the `Activity` window
+- `NetworkModule`: corrected `asConverterFactory` import from deprecated JakeWharton artifact path to official Retrofit 2.11 package (`retrofit2.converter.kotlinx.serialization`)
+- `Icons.Filled.ArrowBack` → `Icons.AutoMirrored.Filled.ArrowBack` in all 6 screens (`ApiUrlScreen`, `RegisterScreen`, `ResetPasswordScreen`, `PageListScreen`, `PageDetailScreen`, `VaultUnlockScreen`)
+
 ---
 
 ## [0.1.0] — 2026-03-18

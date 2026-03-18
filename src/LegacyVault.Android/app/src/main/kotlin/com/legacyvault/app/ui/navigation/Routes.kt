@@ -18,6 +18,10 @@ object Routes {
     // ── Main graph ────────────────────────────────────────────────────────
     const val MAIN_GRAPH   = "main"
 
+    // Vault unlock (encrypted categories)
+    const val VAULT_UNLOCK = "main/categories/{categoryId}/unlock"
+    fun vaultUnlock(categoryId: String) = "main/categories/$categoryId/unlock"
+
     // Categories (Vaults)
     const val CATEGORY_LIST = "main/categories"
     const val CATEGORY_CREATE = "main/categories/create"

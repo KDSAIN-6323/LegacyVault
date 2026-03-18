@@ -47,13 +47,40 @@ class CryptoServiceTest {
     //   console.log("MOBILE:", combined.toString('base64'));
     // });
     // ─────────────────────────────────────────────────────────────────────
-    // TODO: Run the above and replace KNOWN_CIPHERTEXT_MOBILE with the real value.
-    //       Until then, the round-trip tests validate correctness fully.
+    // Vectors generated 2026-03-18 using Node.js crypto (same algorithm as react-native-quick-crypto):
+    //   KEY (hex) : c8b67315e126e491385a4a9ae50d7e0a3848ccebe22a0e902588e5cbb722a70e
+    //   MOBILE    : cwjgUM0ALNw+N1exDJORDuiFlEeBCUo/zwspjatCfAjXfIk=  ([tag][ct])
+    //   WEB       : 6IWUR4EJSj/PCymNq0J8CNd8iXMI4FDNACzcPjdXsQyTkQ4=  ([ct][tag])
 
-    private val KNOWN_PASSWORD   = "test-password-123"
-    private val KNOWN_SALT_B64   = Base64.getEncoder().encodeToString(ByteArray(32))   // 32 zero bytes
-    private val KNOWN_IV_B64     = Base64.getEncoder().encodeToString(ByteArray(12))   // 12 zero bytes
-    private val KNOWN_PLAINTEXT  = "Hello, LegacyVault!"
+    private val KNOWN_PASSWORD             = "test-password-123"
+    private val KNOWN_SALT_B64             = Base64.getEncoder().encodeToString(ByteArray(32))
+    private val KNOWN_IV_B64               = Base64.getEncoder().encodeToString(ByteArray(12))
+    private val KNOWN_PLAINTEXT            = "Hello, LegacyVault!"
+    private val KNOWN_KEY_HEX              = "c8b67315e126e491385a4a9ae50d7e0a3848ccebe22a0e902588e5cbb722a70e"
+    private val KNOWN_CIPHERTEXT_MOBILE    = "cwjgUM0ALNw+N1exDJORDuiFlEeBCUo/zwspjatCfAjXfIk="
+    private val KNOWN_CIPHERTEXT_WEB       = "6IWUR4EJSj/PCymNq0J8CNd8iXMI4FDNACzcPjdXsQyTkQ4="
+
+    // ── Cross-client known-answer tests ──────────────────────────────────
+
+    @Test
+    fun `deriveKey matches Node-js generated key vector`() = runTest {
+        val key = crypto.deriveKey(KNOWN_PASSWORD, KNOWN_SALT_B64)
+        assertEquals(KNOWN_KEY_HEX, key.toHex())
+    }
+
+    @Test
+    fun `decrypt accepts mobile-format ciphertext from Node-js`() = runTest {
+        val key = crypto.deriveKey(KNOWN_PASSWORD, KNOWN_SALT_B64)
+        val plaintext = crypto.decrypt(KNOWN_CIPHERTEXT_MOBILE, KNOWN_IV_B64, key)
+        assertEquals(KNOWN_PLAINTEXT, plaintext)
+    }
+
+    @Test
+    fun `decrypt accepts web-format ciphertext from Node-js`() = runTest {
+        val key = crypto.deriveKey(KNOWN_PASSWORD, KNOWN_SALT_B64)
+        val plaintext = crypto.decrypt(KNOWN_CIPHERTEXT_WEB, KNOWN_IV_B64, key)
+        assertEquals(KNOWN_PLAINTEXT, plaintext)
+    }
 
     // ── generateSalt ──────────────────────────────────────────────────────
 

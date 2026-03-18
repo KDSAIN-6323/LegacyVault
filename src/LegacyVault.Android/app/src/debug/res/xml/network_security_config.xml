@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    DEBUG ONLY: allows cleartext HTTP to local development servers
+    (192.168.x.x, 10.x.x.x, localhost) so the dev API can be reached
+    without a local TLS cert. Never included in release builds.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>    <!-- Android emulator host -->
+    </domain-config>
+    <!-- Allow cleartext for RFC-1918 private ranges (dev LAN) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">192.168.0.0</domain>
+    </domain-config>
+</network-security-config>

@@ -18,10 +18,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class CategoryListUiState(
-    val isSyncing: Boolean        = false,
     val errorMessage: String?     = null,
     val showCreateSheet: Boolean  = false,
-    val editingCategory: Category? = null   // non-null → editing existing
+    val editingCategory: Category? = null
 )
 
 data class CategoryItem(
@@ -52,25 +51,6 @@ class CategoryListViewModel @Inject constructor(
             cats.map { CategoryItem(it, !it.isEncrypted || keyCache.has(it.id)) }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    init {
-        sync()
-    }
-
-    // ── Sync ───────────────────────────────────────────────────────────────
-
-    fun sync() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSyncing = true, errorMessage = null) }
-            repository.sync()
-                .onFailure { e ->
-                    _uiState.update { it.copy(isSyncing = false, errorMessage = e.message) }
-                }
-                .onSuccess {
-                    _uiState.update { it.copy(isSyncing = false) }
-                }
-        }
-    }
 
     // ── Create / Edit sheet ────────────────────────────────────────────────
 

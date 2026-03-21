@@ -33,6 +33,16 @@ interface PageDao {
     """)
     fun observeFavorites(): Flow<List<PageEntity>>
 
+    @Query("""
+        SELECT * FROM pages
+        WHERE type = :type
+        ORDER BY title ASC, updated_at DESC
+    """)
+    fun observeByType(type: String): Flow<List<PageEntity>>
+
+    @Query("SELECT * FROM pages ORDER BY created_at ASC")
+    suspend fun getAll(): List<PageEntity>
+
     /** Full-text search across title. Case-insensitive LIKE. */
     @Query("""
         SELECT * FROM pages

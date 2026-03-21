@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Legacy Vault logo — ported from LegacyVault.Web/public/favicon.svg
+  Outer vault ring + 4 cardinal bolts + inner combination dial + center hub + dial indicator.
+  Viewport: 48×48 (same as web favicon).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+
+    <!-- Outer vault ring  cx=24 cy=24 r=16.5 (stroke only) -->
+    <path
+        android:pathData="M 7.5 24 A 16.5 16.5 0 1 0 40.5 24 A 16.5 16.5 0 1 0 7.5 24"
+        android:fillColor="#00000000"
+        android:strokeColor="#7c3aed"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+
+    <!-- Top bolt  cx=24 cy=5.5 r=3 -->
+    <path
+        android:pathData="M 21 5.5 A 3 3 0 1 0 27 5.5 A 3 3 0 1 0 21 5.5"
+        android:fillColor="#7c3aed" />
+
+    <!-- Right bolt  cx=42.5 cy=24 r=3 -->
+    <path
+        android:pathData="M 39.5 24 A 3 3 0 1 0 45.5 24 A 3 3 0 1 0 39.5 24"
+        android:fillColor="#7c3aed" />
+
+    <!-- Bottom bolt  cx=24 cy=42.5 r=3 -->
+    <path
+        android:pathData="M 21 42.5 A 3 3 0 1 0 27 42.5 A 3 3 0 1 0 21 42.5"
+        android:fillColor="#7c3aed" />
+
+    <!-- Left bolt  cx=5.5 cy=24 r=3 -->
+    <path
+        android:pathData="M 2.5 24 A 3 3 0 1 0 8.5 24 A 3 3 0 1 0 2.5 24"
+        android:fillColor="#7c3aed" />
+
+    <!-- Inner combination-dial ring  cx=24 cy=24 r=9 (stroke only) -->
+    <path
+        android:pathData="M 15 24 A 9 9 0 1 0 33 24 A 9 9 0 1 0 15 24"
+        android:fillColor="#00000000"
+        android:strokeColor="#7c3aed"
+        android:strokeWidth="1.8" />
+
+    <!-- Center hub  cx=24 cy=24 r=3.5 -->
+    <path
+        android:pathData="M 20.5 24 A 3.5 3.5 0 1 0 27.5 24 A 3.5 3.5 0 1 0 20.5 24"
+        android:fillColor="#7c3aed" />
+
+    <!-- Dial indicator — points to ~2 o'clock (partially opened) -->
+    <path
+        android:pathData="M 24 24 L 30.5 20.2"
+        android:fillColor="#00000000"
+        android:strokeColor="#a78bfa"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round" />
+
+</vector>

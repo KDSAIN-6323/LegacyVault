@@ -1,5 +1,7 @@
 package com.legacyvault.app.ui.vault
 
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -21,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -37,13 +41,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import javax.crypto.Cipher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,12 +61,15 @@ fun VaultUnlockScreen(
     viewModel: VaultUnlockViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbar = remember { SnackbarHostState() }
+    val snackbar  = remember { SnackbarHostState() }
+    val context   = LocalContext.current
 
+    // ── Navigate on unlock ────────────────────────────────────────────────────
     LaunchedEffect(uiState.isUnlocked) {
         if (uiState.isUnlocked) onUnlocked()
     }
 
+    // ── Show errors as snackbar ───────────────────────────────────────────────
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
             snackbar.showSnackbar(it)
@@ -66,8 +77,49 @@ fun VaultUnlockScreen(
         }
     }
 
-    var password       by rememberSaveable { mutableStateOf("") }
+    // ── Show BiometricPrompt for enrollment ───────────────────────────────────
+    LaunchedEffect(uiState.enrollCipher) {
+        val cipher = uiState.enrollCipher ?: return@LaunchedEffect
+        val activity = context as? FragmentActivity ?: run {
+            viewModel.dismissEnrollCipher()
+            return@LaunchedEffect
+        }
+        showBiometricPrompt(
+            activity    = activity,
+            title       = "Enable biometric unlock",
+            subtitle    = "Authenticate to save your vault key for future biometric logins",
+            cipher      = cipher,
+            onSuccess   = { viewModel.onBiometricEnrollSuccess(it) },
+            onError     = { viewModel.dismissEnrollCipher() }
+        )
+    }
+
+    // ── Show BiometricPrompt for unlock ───────────────────────────────────────
+    LaunchedEffect(uiState.unlockCipher) {
+        val cipher = uiState.unlockCipher ?: return@LaunchedEffect
+        val activity = context as? FragmentActivity ?: run {
+            viewModel.dismissUnlockCipher()
+            return@LaunchedEffect
+        }
+        showBiometricPrompt(
+            activity    = activity,
+            title       = "Biometric vault unlock",
+            subtitle    = uiState.categoryName,
+            cipher      = cipher,
+            onSuccess   = { viewModel.onBiometricUnlockSuccess(it) },
+            onError     = { viewModel.dismissUnlockCipher() }
+        )
+    }
+
+    var password        by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+
+    // Detect biometric availability for the enroll button
+    val canEnrollBiometric = remember(context) {
+        val bm = BiometricManager.from(context)
+        bm.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
+            BiometricManager.BIOMETRIC_SUCCESS
+    }
 
     Scaffold(
         topBar = {
@@ -92,16 +144,13 @@ fun VaultUnlockScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
-                imageVector         = Icons.Default.Lock,
-                contentDescription  = null,
-                tint                = MaterialTheme.colorScheme.primary,
-                modifier            = Modifier.padding(bottom = 16.dp)
+                imageVector        = Icons.Default.Lock,
+                contentDescription = null,
+                tint               = MaterialTheme.colorScheme.primary,
+                modifier           = Modifier.padding(bottom = 16.dp)
             )
 
-            Text(
-                text  = "This vault is encrypted",
-                style = MaterialTheme.typography.titleLarge
-            )
+            Text("This vault is encrypted", style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(8.dp))
             Text(
                 text  = "Enter the vault password to access its contents.",
@@ -162,6 +211,67 @@ fun VaultUnlockScreen(
                     Text("Unlock vault")
                 }
             }
+
+            // ── Biometric button ───────────────────────────────────────────
+            if (uiState.hasBiometric && canEnrollBiometric) {
+                Spacer(Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick  = { viewModel.prepareBiometricUnlock() },
+                    enabled  = !uiState.isLoading,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        Icons.Default.Fingerprint,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Use biometrics")
+                }
+            } else if (!uiState.hasBiometric && canEnrollBiometric && uiState.isUnlocked) {
+                // Offer enrollment after a successful password unlock
+                Spacer(Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick  = { viewModel.prepareBiometricEnroll() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        Icons.Default.Fingerprint,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("Enable biometric unlock")
+                }
+            }
         }
     }
+}
+
+// ── BiometricPrompt helper ────────────────────────────────────────────────────
+
+private fun showBiometricPrompt(
+    activity: FragmentActivity,
+    title: String,
+    subtitle: String,
+    cipher: Cipher,
+    onSuccess: (Cipher) -> Unit,
+    onError: () -> Unit
+) {
+    val executor = ContextCompat.getMainExecutor(activity)
+    val callback = object : BiometricPrompt.AuthenticationCallback() {
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            result.cryptoObject?.cipher?.let(onSuccess) ?: onError()
+        }
+        override fun onAuthenticationError(errorCode: Int, errString: CharSequence) = onError()
+        override fun onAuthenticationFailed() { /* keep prompt open */ }
+    }
+
+    val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle(title)
+        .setSubtitle(subtitle)
+        .setNegativeButtonText("Cancel")
+        .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+        .build()
+
+    BiometricPrompt(activity, executor, callback)
+        .authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
 }

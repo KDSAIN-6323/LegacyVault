@@ -33,7 +33,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -107,12 +106,8 @@ fun PageListScreen(
         },
         snackbarHost = { SnackbarHost(snackbar) { data -> Snackbar(snackbarData = data) } }
     ) { padding ->
-        PullToRefreshBox(
-            isRefreshing = uiState.isSyncing,
-            onRefresh    = viewModel::sync,
-            modifier     = Modifier.fillMaxSize().padding(padding)
-        ) {
-            if (pages.isEmpty() && !uiState.isSyncing) {
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            if (pages.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         "No pages yet — tap + to add one",
@@ -127,10 +122,10 @@ fun PageListScreen(
                 ) {
                     items(pages, key = { it.id }) { page ->
                         PageSummaryCard(
-                            page          = page,
-                            onTap         = { onPageClick(page.id) },
-                            onToggleFav   = { viewModel.toggleFavorite(page) },
-                            onDelete      = { viewModel.deletePage(page.id) }
+                            page        = page,
+                            onTap       = { onPageClick(page.id) },
+                            onToggleFav = { viewModel.toggleFavorite(page) },
+                            onDelete    = { viewModel.deletePage(page.id) }
                         )
                     }
                 }

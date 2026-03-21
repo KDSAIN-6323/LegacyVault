@@ -10,8 +10,7 @@ activity-compose = "1.9.3"
 navigation-compose = "2.8.3"
 lifecycle = "2.8.7"
 
-retrofit = "2.11.0"
-okhttp = "4.12.0"
+biometric = "1.2.0-alpha05"
 kotlinx-serialization = "1.7.3"
 kotlinx-coroutines = "1.9.0"
 
@@ -21,7 +20,6 @@ security-crypto = "1.1.0-alpha06"
 
 material = "1.12.0"
 coil = "2.7.0"
-play-billing = "7.1.1"
 
 # Testing
 junit = "4.13.2"
@@ -58,12 +56,8 @@ hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 
-# Networking
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
-okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
-okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
+# Biometric
+biometric = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "biometric" }
 
 # Serialization & Coroutines
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
@@ -84,14 +78,12 @@ material = { group = "com.google.android.material", name = "material", version.r
 # Images
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
-# Billing
-play-billing = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "play-billing" }
-
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit5-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }
 junit5-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit5" }
 junit5-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit5" }
+junit-platform-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version = "1.10.2" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }

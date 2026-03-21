@@ -1,17 +1,23 @@
 package com.legacyvault.app.ui.pages.editors
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.legacyvault.app.domain.model.PageContent
@@ -32,15 +41,40 @@ fun QuoteEditor(
     modifier: Modifier = Modifier
 ) {
     var tagInput by remember { mutableStateOf("") }
+    val clipboard = LocalClipboardManager.current
+
+    // Formats the quote as: "Text" — Author (Source)
+    fun buildCopyText(): String = buildString {
+        if (content.text.isNotBlank()) append("\u201c${content.text}\u201d")
+        if (content.author.isNotBlank()) append(" \u2014 ${content.author}")
+        if (content.source.isNotBlank()) append(" (${content.source})")
+    }
 
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
 
-        OutlinedTextField(
-            value         = content.text,
-            onValueChange = { onContentChange(content.copy(text = it)) },
-            label         = { Text("Quote text") },
-            modifier      = Modifier.fillMaxWidth()
-        )
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value         = content.text,
+                onValueChange = { onContentChange(content.copy(text = it)) },
+                label         = { Text("Quote text") },
+                modifier      = Modifier.fillMaxWidth().padding(end = 40.dp)
+            )
+            IconButton(
+                onClick  = { clipboard.setText(AnnotatedString(buildCopyText())) },
+                enabled  = content.text.isNotBlank(),
+                modifier = Modifier.align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    Icons.Default.ContentCopy,
+                    contentDescription = "Copy quote",
+                    modifier = Modifier.size(20.dp),
+                    tint = if (content.text.isNotBlank())
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
 
         OutlinedTextField(
             value         = content.author,

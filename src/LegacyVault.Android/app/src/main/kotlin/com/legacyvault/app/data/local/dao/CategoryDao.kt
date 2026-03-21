@@ -26,6 +26,12 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE is_favorite = 1 ORDER BY name ASC")
     fun observeFavorites(): Flow<List<CategoryEntity>>
 
+    @Query("SELECT * FROM categories ORDER BY created_at ASC")
+    suspend fun getAll(): List<CategoryEntity>
+
+    @Query("UPDATE categories SET page_count = (SELECT COUNT(*) FROM pages WHERE category_id = :id) WHERE id = :id")
+    suspend fun recalculatePageCount(id: String)
+
     // ── Upsert / insert ────────────────────────────────────────────────────
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

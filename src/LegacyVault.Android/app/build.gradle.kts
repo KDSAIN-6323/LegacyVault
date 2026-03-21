@@ -21,8 +21,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Exposed to BuildConfig for use in NetworkModule
-        buildConfigField("String", "DEFAULT_API_URL", "\"https://api.legacyvault.app\"")
     }
 
     buildTypes {
@@ -84,11 +82,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // Networking
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging)
+    // Biometric
+    implementation(libs.biometric)
 
     // Serialization & Coroutines
     implementation(libs.kotlinx.serialization.json)
@@ -109,16 +104,13 @@ dependencies {
     // Images
     implementation(libs.coil.compose)
 
-    // Billing
-    implementation(libs.play.billing)
-
     // Testing
     testImplementation(libs.junit5.api)
     testImplementation(libs.junit5.params)
     testRuntimeOnly(libs.junit5.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.mockk)
     testImplementation(libs.coroutines.test)
-    testImplementation(libs.okhttp.mockwebserver)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.compose.ui.test.junit4)

@@ -9,11 +9,6 @@ import com.legacyvault.app.domain.model.Page
 import com.legacyvault.app.domain.model.PageSummary
 import com.legacyvault.app.domain.model.enums.PageType
 
-/**
- * Full page row.  [content] stores raw JSON for unencrypted pages and
- * Base64 ciphertext for encrypted ones — mirroring the wire format.
- * Decryption always happens in the use-case / presentation layer.
- */
 @Entity(
     tableName = "pages",
     foreignKeys = [
@@ -37,15 +32,12 @@ data class PageEntity(
     @ColumnInfo(name = "category_id")
     val categoryId: String,
 
-    val type: String,           // PageType name
+    val type: String,
     val title: String,
     val content: String,        // raw JSON or Base64 ciphertext
 
     @ColumnInfo(name = "is_encrypted")
     val isEncrypted: Boolean,
-
-    @ColumnInfo(name = "encryption_salt")
-    val encryptionSalt: String?,
 
     @ColumnInfo(name = "encryption_iv")
     val encryptionIV: String?,
@@ -62,20 +54,18 @@ data class PageEntity(
     @ColumnInfo(name = "updated_at")
     val updatedAt: String
 ) {
-    fun toDomain(attachments: List<com.legacyvault.app.domain.model.Attachment> = emptyList()) = Page(
-        id             = id,
-        categoryId     = categoryId,
-        type           = PageType.valueOf(type),
-        title          = title,
-        content        = content,
-        isEncrypted    = isEncrypted,
-        encryptionSalt = encryptionSalt,
-        encryptionIV   = encryptionIV,
-        isFavorite     = isFavorite,
-        sortOrder      = sortOrder,
-        createdAt      = createdAt,
-        updatedAt      = updatedAt,
-        attachments    = attachments
+    fun toDomain() = Page(
+        id          = id,
+        categoryId  = categoryId,
+        type        = PageType.valueOf(type),
+        title       = title,
+        content     = content,
+        isEncrypted = isEncrypted,
+        encryptionIV = encryptionIV,
+        isFavorite  = isFavorite,
+        sortOrder   = sortOrder,
+        createdAt   = createdAt,
+        updatedAt   = updatedAt
     )
 
     fun toSummary() = PageSummary(
@@ -91,16 +81,15 @@ data class PageEntity(
 }
 
 fun Page.toEntity() = PageEntity(
-    id             = id,
-    categoryId     = categoryId,
-    type           = type.name,
-    title          = title,
-    content        = content,
-    isEncrypted    = isEncrypted,
-    encryptionSalt = encryptionSalt,
-    encryptionIV   = encryptionIV,
-    isFavorite     = isFavorite,
-    sortOrder      = sortOrder,
-    createdAt      = createdAt,
-    updatedAt      = updatedAt
+    id           = id,
+    categoryId   = categoryId,
+    type         = type.name,
+    title        = title,
+    content      = content,
+    isEncrypted  = isEncrypted,
+    encryptionIV = encryptionIV,
+    isFavorite   = isFavorite,
+    sortOrder    = sortOrder,
+    createdAt    = createdAt,
+    updatedAt    = updatedAt
 )

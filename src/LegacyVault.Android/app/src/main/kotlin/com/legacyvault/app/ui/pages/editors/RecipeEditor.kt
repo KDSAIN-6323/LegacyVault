@@ -4,14 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +33,8 @@ import com.legacyvault.app.domain.model.PageContent
 fun RecipeEditor(
     content: PageContent.Recipe,
     onContentChange: (PageContent.Recipe) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAddToShoppingList: (() -> Unit)? = null
 ) {
     var ingredientInput  by remember { mutableStateOf("") }
     var instructionInput by remember { mutableStateOf("") }
@@ -98,6 +102,20 @@ fun RecipeEditor(
             }),
             modifier = Modifier.fillMaxWidth()
         )
+
+        if (onAddToShoppingList != null && content.ingredients.isNotEmpty()) {
+            OutlinedButton(
+                onClick  = onAddToShoppingList,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    Icons.Default.ShoppingCart,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text("  Add ingredients to shopping list")
+            }
+        }
 
         HorizontalDivider()
 

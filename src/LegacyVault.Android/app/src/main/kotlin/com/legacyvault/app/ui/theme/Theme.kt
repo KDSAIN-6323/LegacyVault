@@ -8,7 +8,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 
 private val DarkColorScheme = darkColorScheme(
     primary          = DarkAccent,
@@ -53,6 +56,7 @@ fun LegacyVaultTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic colour (Android 12+) — disabled by default to preserve brand colours
     dynamicColor: Boolean = false,
+    fontScale: Float = 1f,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -64,9 +68,17 @@ fun LegacyVaultTheme(
         else      -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography  = LegacyVaultTypography,
-        content     = content
-    )
+    val density = LocalDensity.current
+    CompositionLocalProvider(
+        LocalDensity provides Density(
+            density   = density.density,
+            fontScale = fontScale
+        )
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography  = LegacyVaultTypography,
+            content     = content
+        )
+    }
 }

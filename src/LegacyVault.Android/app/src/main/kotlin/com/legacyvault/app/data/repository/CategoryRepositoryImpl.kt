@@ -2,26 +2,21 @@ package com.legacyvault.app.data.repository
 
 import com.legacyvault.app.data.local.dao.CategoryDao
 import com.legacyvault.app.data.local.entity.toEntity
-import com.legacyvault.app.data.remote.api.CategoriesApiService
-import com.legacyvault.app.data.remote.dto.CreateCategoryRequest
-import com.legacyvault.app.data.remote.dto.UpdateCategoryRequest
-import com.legacyvault.app.data.remote.mapper.toDomain
-import com.legacyvault.app.data.remote.network.bodyOrThrow
-import com.legacyvault.app.data.remote.network.throwIfError
 import com.legacyvault.app.domain.model.Category
+import com.legacyvault.app.domain.model.enums.CategoryType
 import com.legacyvault.app.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CategoryRepositoryImpl @Inject constructor(
-    private val dao: CategoryDao,
-    private val api: CategoriesApiService
+    private val dao: CategoryDao
 ) : CategoryRepository {
-
-    // ── Observe (Room → domain) ────────────────────────────────────────────
 
     override fun observeAll(): Flow<List<Category>> =
         dao.observeAll().map { it.map { e -> e.toDomain() } }
@@ -32,18 +27,6 @@ class CategoryRepositoryImpl @Inject constructor(
     override fun observeFavorites(): Flow<List<Category>> =
         dao.observeFavorites().map { it.map { e -> e.toDomain() } }
 
-    // ── Remote → cache ────────────────────────────────────────────────────
-
-    override suspend fun sync(): Result<List<Category>> = runCatching {
-        val response = api.getAll()
-        val dtos     = response.bodyOrThrow()
-        val domains  = dtos.map { it.toDomain() }
-        dao.replaceAll(domains.map { it.toEntity() })
-        domains
-    }
-
-    // ── Mutations ──────────────────────────────────────────────────────────
-
     override suspend fun create(
         name: String,
         icon: String,
@@ -52,11 +35,22 @@ class CategoryRepositoryImpl @Inject constructor(
         encryptionSalt: String?,
         passwordHint: String?
     ): Result<Category> = runCatching {
-        val request  = CreateCategoryRequest(name, icon, type, isEncrypted, encryptionSalt, passwordHint)
-        val response = api.create(request)
-        val domain   = response.bodyOrThrow().toDomain()
-        dao.upsert(domain.toEntity())
-        domain
+        val now = Instant.now().toString()
+        val category = Category(
+            id             = UUID.randomUUID().toString(),
+            type           = CategoryType.valueOf(type),
+            name           = name,
+            icon           = icon,
+            isEncrypted    = isEncrypted,
+            encryptionSalt = encryptionSalt,
+            passwordHint   = passwordHint,
+            isFavorite     = false,
+            pageCount      = 0,
+            createdAt      = now,
+            updatedAt      = now
+        )
+        dao.upsert(category.toEntity())
+        category
     }
 
     override suspend fun update(
@@ -65,21 +59,23 @@ class CategoryRepositoryImpl @Inject constructor(
         icon: String,
         passwordHint: String?
     ): Result<Category> = runCatching {
-        val request  = UpdateCategoryRequest(name, icon, passwordHint)
-        val response = api.update(id, request)
-        val domain   = response.bodyOrThrow().toDomain()
-        dao.upsert(domain.toEntity())
-        domain
+        val existing = dao.observeById(id).first()
+            ?: throw NoSuchElementException("Category $id not found")
+        val updated = existing.copy(
+            name         = name,
+            icon         = icon,
+            passwordHint = passwordHint,
+            updatedAt    = Instant.now().toString()
+        )
+        dao.upsert(updated)
+        updated.toDomain()
     }
 
     override suspend fun delete(id: String): Result<Unit> = runCatching {
-        api.delete(id).throwIfError()
         dao.deleteById(id)
     }
 
     override suspend fun setFavorite(id: String, isFavorite: Boolean): Result<Unit> = runCatching {
-        if (isFavorite) api.favorite(id).throwIfError()
-        else            api.unfavorite(id).throwIfError()
         dao.setFavorite(id, isFavorite)
     }
 }

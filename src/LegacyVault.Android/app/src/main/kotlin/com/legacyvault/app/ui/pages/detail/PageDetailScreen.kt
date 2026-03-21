@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -57,7 +59,8 @@ fun PageDetailScreen(
     onSavedAndNew: (() -> Unit)? = null,
     viewModel: PageDetailViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState      by viewModel.uiState.collectAsStateWithLifecycle()
+    val shoppingLists by viewModel.shoppingLists.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     var showDiscardDialog by remember { mutableStateOf(false) }
 
@@ -73,6 +76,13 @@ fun PageDetailScreen(
         uiState.errorMessage?.let {
             snackbar.showSnackbar(it)
             viewModel.clearError()
+        }
+    }
+
+    LaunchedEffect(uiState.addedToListName) {
+        uiState.addedToListName?.let {
+            snackbar.showSnackbar("Ingredients added to \"$it\"")
+            viewModel.clearAddedToListName()
         }
     }
 
@@ -165,10 +175,12 @@ fun PageDetailScreen(
 
                     // Type-specific editor
                     PageContentEditor(
-                        content         = uiState.content!!,
-                        pageType        = uiState.pageType!!,
-                        onContentChange = viewModel::onContentChange,
-                        modifier        = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        content              = uiState.content!!,
+                        pageType             = uiState.pageType!!,
+                        onContentChange      = viewModel::onContentChange,
+                        onAddToShoppingList  = if (uiState.pageType == PageType.Recipe)
+                            viewModel::showShoppingListPicker else null,
+                        modifier             = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
             }
@@ -190,6 +202,39 @@ fun PageDetailScreen(
             }
         )
     }
+
+    if (uiState.showShoppingListPicker) {
+        val recipe = uiState.content as? PageContent.Recipe
+        AlertDialog(
+            onDismissRequest = viewModel::dismissShoppingListPicker,
+            title = { Text("Add to shopping list") },
+            text  = {
+                if (shoppingLists.isEmpty()) {
+                    Text("No shopping lists found. Create one inside a vault first.")
+                } else {
+                    LazyColumn {
+                        items(shoppingLists) { list ->
+                            TextButton(
+                                onClick = {
+                                    viewModel.addIngredientsToShoppingList(
+                                        target      = list,
+                                        ingredients = recipe?.ingredients ?: emptyList()
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(list.title, style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = viewModel::dismissShoppingListPicker) { Text("Cancel") }
+            }
+        )
+    }
 }
 
 @Composable
@@ -197,6 +242,7 @@ private fun PageContentEditor(
     content: PageContent,
     pageType: PageType,
     onContentChange: (PageContent) -> Unit,
+    onAddToShoppingList: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     when (pageType) {
@@ -211,9 +257,10 @@ private fun PageContentEditor(
             modifier        = modifier
         )
         PageType.Recipe -> RecipeEditor(
-            content         = content as? PageContent.Recipe ?: PageContent.Recipe(),
-            onContentChange = { onContentChange(it) },
-            modifier        = modifier
+            content              = content as? PageContent.Recipe ?: PageContent.Recipe(),
+            onContentChange      = { onContentChange(it) },
+            onAddToShoppingList  = onAddToShoppingList,
+            modifier             = modifier
         )
         PageType.Quote -> QuoteEditor(
             content         = content as? PageContent.Quote ?: PageContent.Quote(),

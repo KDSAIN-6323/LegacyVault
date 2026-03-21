@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class PageListUiState(
-    val isSyncing: Boolean    = false,
     val errorMessage: String? = null
 )
 
@@ -41,23 +40,6 @@ class PageListViewModel @Inject constructor(
     val category: StateFlow<Category?> = categoryRepository
         .observeById(categoryId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
-    init {
-        sync()
-    }
-
-    fun sync() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSyncing = true, errorMessage = null) }
-            pageRepository.syncCategory(categoryId)
-                .onFailure { e ->
-                    _uiState.update { it.copy(isSyncing = false, errorMessage = e.message) }
-                }
-                .onSuccess {
-                    _uiState.update { it.copy(isSyncing = false) }
-                }
-        }
-    }
 
     fun deletePage(pageId: String) {
         viewModelScope.launch {

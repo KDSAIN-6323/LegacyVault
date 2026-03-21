@@ -15,40 +15,19 @@ import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
-/**
- * Persistent user preferences backed by Jetpack DataStore.
- * Never stores secrets — tokens live in [TokenStore] (memory) and
- * [PersistentCookieJar] (EncryptedSharedPreferences).
- */
+/** Persistent user preferences backed by Jetpack DataStore. */
 @Singleton
 class UserPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     companion object {
-        private val KEY_API_BASE_URL         = stringPreferencesKey("api_base_url")
         private val KEY_THEME                = stringPreferencesKey("theme")
         private val KEY_INACTIVITY_TIMEOUT   = intPreferencesKey("inactivity_timeout_minutes")
         private val KEY_FONT_SIZE            = stringPreferencesKey("font_size")
 
-        const val DEFAULT_API_URL            = "https://api.legacyvault.app"
-        const val DEFAULT_THEME              = "system"   // "system" | "light" | "dark"
+        const val DEFAULT_THEME              = "system"
         const val DEFAULT_INACTIVITY_MINUTES = 10
-        const val DEFAULT_FONT_SIZE          = "medium"   // "small" | "medium" | "large"
-    }
-
-    // ── API Base URL ──────────────────────────────────────────────────────
-
-    val apiBaseUrl: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[KEY_API_BASE_URL] ?: DEFAULT_API_URL
-    }
-
-    suspend fun setApiBaseUrl(url: String) {
-        context.dataStore.edit { it[KEY_API_BASE_URL] = url.trimEnd('/') }
-    }
-
-    /** True if the user has never configured a base URL (first-launch state). */
-    val isApiUrlConfigured: Flow<Boolean> = context.dataStore.data.map { prefs ->
-        prefs[KEY_API_BASE_URL] != null
+        const val DEFAULT_FONT_SIZE          = "medium"
     }
 
     // ── Theme ─────────────────────────────────────────────────────────────

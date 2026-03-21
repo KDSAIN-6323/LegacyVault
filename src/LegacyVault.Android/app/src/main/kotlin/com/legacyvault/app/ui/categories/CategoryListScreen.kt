@@ -35,7 +35,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,11 +56,14 @@ import com.legacyvault.app.ui.navigation.Routes
 fun CategoryListScreen(
     onCategoryClick: (Category, isUnlocked: Boolean) -> Unit,
     onNavigate: (String) -> Unit,
+    onOpenBackup: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
     viewModel: CategoryListViewModel = hiltViewModel()
 ) {
     val uiState   by viewModel.uiState.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
     val snackbar   = remember { SnackbarHostState() }
+    var topMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
@@ -72,7 +74,29 @@ fun CategoryListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Vaults") })
+            TopAppBar(
+                title = { Text("Vaults") },
+                actions = {
+                    Box {
+                        IconButton(onClick = { topMenuExpanded = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                        }
+                        DropdownMenu(
+                            expanded = topMenuExpanded,
+                            onDismissRequest = { topMenuExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text    = { Text("Backup & Restore") },
+                                onClick = { topMenuExpanded = false; onOpenBackup() }
+                            )
+                            DropdownMenuItem(
+                                text    = { Text("Settings") },
+                                onClick = { topMenuExpanded = false; onOpenSettings() }
+                            )
+                        }
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = viewModel::showCreateSheet) {
@@ -84,12 +108,8 @@ fun CategoryListScreen(
         },
         snackbarHost = { SnackbarHost(snackbar) { data -> Snackbar(snackbarData = data) } }
     ) { padding ->
-        PullToRefreshBox(
-            isRefreshing = uiState.isSyncing,
-            onRefresh    = viewModel::sync,
-            modifier     = Modifier.fillMaxSize().padding(padding)
-        ) {
-            if (categories.isEmpty() && !uiState.isSyncing) {
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            if (categories.isEmpty()) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         "No vaults yet — tap + to create one",

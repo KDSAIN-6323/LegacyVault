@@ -52,11 +52,34 @@ export const cryptoService = {
     };
   },
 
-  /** Decrypt a Base64 ciphertext using the stored IV and key. */
+  /** Decrypt a Base64 ciphertext using the stored IV and key.
+   *
+   * Supports two wire formats:
+   *   Web format (native):    Base64([ciphertext][16-byte tag])  — tag appended
+   *   Mobile format (Android/iOS): Base64([16-byte tag][ciphertext]) — tag prepended
+   *
+   * Tries web format first; on auth failure retries with tag moved to the end.
+   */
   async decrypt(ciphertextBase64: string, ivBase64: string, key: CryptoKey): Promise<string> {
-    const cipherBuffer = Uint8Array.from(atob(ciphertextBase64), (c) => c.charCodeAt(0));
+    const combined = Uint8Array.from(atob(ciphertextBase64), (c) => c.charCodeAt(0));
     const iv = Uint8Array.from(atob(ivBase64), (c) => c.charCodeAt(0));
-    const plainBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, cipherBuffer);
+
+    // Try web format first: [ciphertext || tag]
+    try {
+      const plainBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, combined);
+      return new TextDecoder().decode(plainBuffer);
+    } catch (_: unknown) {
+      // Fall through — likely mobile format
+    }
+
+    // Retry with mobile format: [tag || ciphertext] → rearrange to [ciphertext || tag]
+    if (combined.length < 16) throw new Error('Ciphertext too short');
+    const tag = combined.subarray(0, 16);
+    const ciphertext = combined.subarray(16);
+    const reordered = new Uint8Array(ciphertext.length + 16);
+    reordered.set(ciphertext, 0);
+    reordered.set(tag, ciphertext.length);
+    const plainBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, reordered);
     return new TextDecoder().decode(plainBuffer);
   },
 };

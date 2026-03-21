@@ -46,14 +46,27 @@ export const cryptoService = {
   async decrypt(ciphertextBase64: string, ivBase64: string, key: Buffer): Promise<string> {
     const combined = Buffer.from(ciphertextBase64, 'base64');
     const iv = Buffer.from(ivBase64, 'base64');
-    const authTag = combined.subarray(0, 16);
-    const ciphertext = combined.subarray(16);
+
+    if (combined.length < 16) throw new Error('Ciphertext too short');
+
+    // Try mobile format first: [tag || ciphertext] (tag prepended)
+    try {
+      const authTag = combined.subarray(0, 16);
+      const ciphertext = combined.subarray(16);
+      const decipher = QuickCrypto.createDecipheriv('aes-256-gcm', key, iv);
+      (decipher as any).setAuthTag(authTag);
+      const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+      return decrypted.toString('utf8');
+    } catch (_: unknown) {
+      // Fall through — likely web format
+    }
+
+    // Retry with web format: [ciphertext || tag] (tag appended)
+    const authTag = combined.subarray(combined.length - 16);
+    const ciphertext = combined.subarray(0, combined.length - 16);
     const decipher = QuickCrypto.createDecipheriv('aes-256-gcm', key, iv);
     (decipher as any).setAuthTag(authTag);
-    const decrypted = Buffer.concat([
-      decipher.update(ciphertext),
-      decipher.final(),
-    ]);
+    const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
     return decrypted.toString('utf8');
   },
 };

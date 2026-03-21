@@ -33,13 +33,13 @@ class RemindersNotifier extends StateNotifier<RemindersState> {
   final PageRepository _repo;
 
   RemindersNotifier(this._repo) : super(const RemindersState()) {
-    loadReminders();
+    loadRemindersAsync();
   }
 
-  Future<void> loadReminders() async {
+  Future<void> loadRemindersAsync() async {
     state = state.copyWith(isLoading: true);
     try {
-      final pages = await _repo.getPagesByType(PageType.reminder);
+      final pages = await _repo.getPagesByTypeAsync(PageType.reminder);
       final reminders = <({PageModel page, ReminderContent content})>[];
 
       for (final page in pages) {

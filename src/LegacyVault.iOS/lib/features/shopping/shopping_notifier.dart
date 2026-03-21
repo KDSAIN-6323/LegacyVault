@@ -33,13 +33,13 @@ class ShoppingNotifier extends StateNotifier<ShoppingState> {
   final PageRepository _repo;
 
   ShoppingNotifier(this._repo) : super(const ShoppingState()) {
-    loadShoppingLists();
+    loadShoppingListsAsync();
   }
 
-  Future<void> loadShoppingLists() async {
+  Future<void> loadShoppingListsAsync() async {
     state = state.copyWith(isLoading: true);
     try {
-      final pages = await _repo.getPagesByType(PageType.shoppingList);
+      final pages = await _repo.getPagesByTypeAsync(PageType.shoppingList);
       final lists = <({PageModel page, ShoppingListContent content})>[];
 
       for (final page in pages) {
@@ -62,7 +62,8 @@ class ShoppingNotifier extends StateNotifier<ShoppingState> {
     }
   }
 
-  Future<void> toggleItem(PageModel page, ShoppingListContent content, int itemIndex) async {
+  Future<void> toggleItemAsync(
+      PageModel page, ShoppingListContent content, int itemIndex) async {
     final items = List.of(content.items);
     items[itemIndex] = items[itemIndex].copyWith(
       checked: !items[itemIndex].checked,
@@ -70,13 +71,15 @@ class ShoppingNotifier extends StateNotifier<ShoppingState> {
     final updated = content.copyWith(items: items);
 
     try {
-      await _repo.updatePage(
+      await _repo.updatePageAsync(
         page: page,
         title: page.title,
         content: updated,
       );
-      await loadShoppingLists();
-    } catch (_) {}
+      await loadShoppingListsAsync();
+    } catch (e) {
+      state = state.copyWith(error: e.toString());
+    }
   }
 }
 

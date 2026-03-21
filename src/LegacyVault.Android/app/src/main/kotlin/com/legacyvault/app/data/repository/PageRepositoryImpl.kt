@@ -1,5 +1,7 @@
 package com.legacyvault.app.data.repository
 
+import androidx.room.withTransaction
+import com.legacyvault.app.data.local.LegacyVaultDatabase
 import com.legacyvault.app.data.local.dao.CategoryDao
 import com.legacyvault.app.data.local.dao.PageDao
 import com.legacyvault.app.data.local.entity.toEntity
@@ -17,6 +19,7 @@ import javax.inject.Singleton
 
 @Singleton
 class PageRepositoryImpl @Inject constructor(
+    private val database: LegacyVaultDatabase,
     private val pageDao: PageDao,
     private val categoryDao: CategoryDao
 ) : PageRepository {
@@ -89,9 +92,11 @@ class PageRepositoryImpl @Inject constructor(
         pageId: String,
         targetCategoryId: String
     ): Result<Unit> = runCatching {
-        pageDao.moveTo(pageId, targetCategoryId)
-        categoryDao.decrementPageCount(categoryId)
-        categoryDao.incrementPageCount(targetCategoryId)
+        database.withTransaction {
+            pageDao.moveTo(pageId, targetCategoryId)
+            categoryDao.decrementPageCount(categoryId)
+            categoryDao.incrementPageCount(targetCategoryId)
+        }
     }
 
     override suspend fun setFavorite(

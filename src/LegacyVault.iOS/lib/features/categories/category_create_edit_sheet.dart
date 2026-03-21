@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/crypto/crypto_service_impl.dart';
 import '../../core/models/category_model.dart';
@@ -76,7 +77,7 @@ class _CategoryCreateEditSheetState
         final crypto = CryptoServiceImpl();
         salt = crypto.generateSalt();
       }
-      await notifier.createCategory(
+      await notifier.createCategoryAsync(
         name: name,
         icon: _selectedIcon,
         isEncrypted: _isEncrypted,
@@ -84,7 +85,7 @@ class _CategoryCreateEditSheetState
         passwordHint: _hintCtrl.text.trim().isEmpty ? null : _hintCtrl.text.trim(),
       );
     } else {
-      await notifier.updateCategory(
+      await notifier.updateCategoryAsync(
         widget.existing!.copyWith(
           name: name,
           icon: _selectedIcon,
@@ -95,7 +96,7 @@ class _CategoryCreateEditSheetState
       );
     }
 
-    if (mounted) Navigator.of(context).pop();
+    if (mounted) context.pop();
   }
 
   @override

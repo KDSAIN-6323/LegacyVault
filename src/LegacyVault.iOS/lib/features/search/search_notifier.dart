@@ -32,14 +32,14 @@ class SearchNotifier extends StateNotifier<SearchState> {
 
   SearchNotifier(this._repo) : super(const SearchState());
 
-  Future<void> search(String query) async {
-    state = state.copyWith(query: query, isLoading: true);
+  Future<void> searchAsync(String query) async {
     if (query.trim().isEmpty) {
-      state = SearchState(query: query);
+      state = SearchState(query: query, isLoading: false);
       return;
     }
+    state = state.copyWith(query: query, isLoading: true);
     try {
-      final results = await _repo.searchPages(query.trim());
+      final results = await _repo.searchPagesAsync(query.trim());
       state = SearchState(results: results, query: query);
     } catch (e) {
       state = state.copyWith(isLoading: false);

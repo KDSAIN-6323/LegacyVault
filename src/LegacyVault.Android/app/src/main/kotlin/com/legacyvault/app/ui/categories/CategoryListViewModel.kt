@@ -2,6 +2,7 @@ package com.legacyvault.app.ui.categories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.legacyvault.app.crypto.CryptoService
 import com.legacyvault.app.crypto.KeyCache
 import com.legacyvault.app.domain.model.Category
 import com.legacyvault.app.domain.model.enums.CategoryType
@@ -31,7 +32,8 @@ data class CategoryItem(
 @HiltViewModel
 class CategoryListViewModel @Inject constructor(
     private val repository: CategoryRepository,
-    private val keyCache: KeyCache
+    private val keyCache: KeyCache,
+    private val cryptoService: CryptoService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CategoryListUiState())
@@ -73,7 +75,7 @@ class CategoryListViewModel @Inject constructor(
             if (existing == null) {
                 // Create
                 val salt = if (type == CategoryType.Vault)
-                    com.legacyvault.app.crypto.CryptoServiceImpl().generateSalt()
+                    cryptoService.generateSalt()
                 else null
 
                 repository.create(
@@ -111,7 +113,9 @@ class CategoryListViewModel @Inject constructor(
 
     fun toggleFavorite(cat: Category) {
         viewModelScope.launch {
-            repository.setFavorite(cat.id, !cat.isFavorite)
+            repository.setFavorite(cat.id, !cat.isFavorite).onFailure { e ->
+                _uiState.update { it.copy(errorMessage = e.message) }
+            }
         }
     }
 

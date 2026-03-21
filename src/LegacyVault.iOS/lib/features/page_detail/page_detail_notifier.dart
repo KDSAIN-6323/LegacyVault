@@ -51,26 +51,27 @@ class PageDetailNotifier extends StateNotifier<PageDetailState> {
   })  : _repo = repo,
         super(const PageDetailState()) {
     if (pageId != null) {
-      _loadPage();
+      _loadPageAsync();
     }
   }
 
-  Future<void> _loadPage() async {
+  Future<void> _loadPageAsync() async {
     state = state.copyWith(isLoading: true);
     try {
-      final page = await _repo.getPageById(pageId!);
+      final page = await _repo.getPageByIdAsync(pageId!);
       if (page == null) {
         state = state.copyWith(isLoading: false, error: 'Page not found');
         return;
       }
       final content = _repo.decryptAndParseContent(page);
-      state = PageDetailState(page: page, content: content);
+      // Explicitly set isLoading: false on success
+      state = PageDetailState(page: page, content: content, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
 
-  Future<bool> savePage({
+  Future<bool> savePageAsync({
     required String title,
     required PageContent content,
   }) async {
@@ -79,7 +80,7 @@ class PageDetailNotifier extends StateNotifier<PageDetailState> {
       if (state.page == null) {
         // Create new
         final type = initialType ?? PageType.note;
-        await _repo.createPage(
+        await _repo.createPageAsync(
           categoryId: categoryId,
           type: type,
           title: title,
@@ -88,7 +89,7 @@ class PageDetailNotifier extends StateNotifier<PageDetailState> {
         );
       } else {
         // Update existing
-        await _repo.updatePage(
+        await _repo.updatePageAsync(
           page: state.page!,
           title: title,
           content: content,

@@ -23,8 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -45,11 +47,12 @@ fun PasswordEditor(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
 
         OutlinedTextField(
-            value         = content.url,
-            onValueChange = { onContentChange(content.copy(url = it)) },
-            label         = { Text("Website URL") },
-            singleLine    = true,
-            modifier      = Modifier.fillMaxWidth()
+            value           = content.url,
+            onValueChange   = { onContentChange(content.copy(url = it)) },
+            label           = { Text("Website URL") },
+            singleLine      = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+            modifier        = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(

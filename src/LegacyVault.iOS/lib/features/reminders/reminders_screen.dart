@@ -22,8 +22,11 @@ class RemindersScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                ref.read(remindersNotifierProvider.notifier).loadReminders(),
+            onPressed: () async {
+              await ref
+                  .read(remindersNotifierProvider.notifier)
+                  .loadRemindersAsync();
+            },
           ),
         ],
       ),

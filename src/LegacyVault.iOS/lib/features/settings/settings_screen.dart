@@ -129,9 +129,9 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('Choose Theme'),
         children: AppTheme.values
             .map((t) => SimpleDialogOption(
-                  onPressed: () {
-                    notifier.setTheme(t);
-                    Navigator.of(ctx).pop();
+                  onPressed: () async {
+                    await notifier.setThemeAsync(t);
+                    if (ctx.mounted) ctx.pop();
                   },
                   child: Row(
                     children: [
@@ -156,9 +156,9 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('Font Size'),
         children: FontSize.values
             .map((s) => SimpleDialogOption(
-                  onPressed: () {
-                    notifier.setFontSize(s);
-                    Navigator.of(ctx).pop();
+                  onPressed: () async {
+                    await notifier.setFontSizeAsync(s);
+                    if (ctx.mounted) ctx.pop();
                   },
                   child: Row(
                     children: [
@@ -184,9 +184,9 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('Auto-Lock After'),
         children: options
             .map((minutes) => SimpleDialogOption(
-                  onPressed: () {
-                    notifier.setInactivityMinutes(minutes);
-                    Navigator.of(ctx).pop();
+                  onPressed: () async {
+                    await notifier.setInactivityMinutesAsync(minutes);
+                    if (ctx.mounted) ctx.pop();
                   },
                   child: Row(
                     children: [

@@ -31,10 +31,10 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
   final CategoryRepository _repo;
 
   CategoriesNotifier(this._repo) : super(const CategoriesState()) {
-    loadCategories();
+    loadCategoriesAsync();
   }
 
-  Future<void> loadCategories() async {
+  Future<void> loadCategoriesAsync() async {
     state = state.copyWith(isLoading: true);
     try {
       final cats = await _repo.getAllCategories();
@@ -44,7 +44,7 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
     }
   }
 
-  Future<Category?> createCategory({
+  Future<Category?> createCategoryAsync({
     required String name,
     required String icon,
     bool isEncrypted = false,
@@ -60,7 +60,7 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
         encryptionSalt: encryptionSalt,
         passwordHint: passwordHint,
       );
-      await loadCategories();
+      await loadCategoriesAsync();
       return cat;
     } catch (e) {
       state = state.copyWith(error: e.toString());
@@ -68,28 +68,28 @@ class CategoriesNotifier extends StateNotifier<CategoriesState> {
     }
   }
 
-  Future<void> updateCategory(Category category) async {
+  Future<void> updateCategoryAsync(Category category) async {
     try {
       await _repo.updateCategory(category);
-      await loadCategories();
+      await loadCategoriesAsync();
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
   }
 
-  Future<void> toggleFavorite(Category category) async {
+  Future<void> toggleFavoriteAsync(Category category) async {
     try {
       await _repo.toggleFavorite(category);
-      await loadCategories();
+      await loadCategoriesAsync();
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
   }
 
-  Future<void> deleteCategory(String id) async {
+  Future<void> deleteCategoryAsync(String id) async {
     try {
       await _repo.deleteCategory(id);
-      await loadCategories();
+      await loadCategoriesAsync();
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }

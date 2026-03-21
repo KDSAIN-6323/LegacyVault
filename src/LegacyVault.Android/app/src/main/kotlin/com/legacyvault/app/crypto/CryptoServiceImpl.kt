@@ -2,10 +2,14 @@ package com.legacyvault.app.crypto
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.security.InvalidAlgorithmParameterException
+import java.security.InvalidKeyException
 import java.security.SecureRandom
 import java.util.Base64
 import javax.crypto.AEADBadTagException
+import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
+import javax.crypto.IllegalBlockSizeException
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.PBEKeySpec
@@ -155,9 +159,15 @@ class CryptoServiceImpl @Inject constructor() : CryptoService {
             cipher.init(Cipher.DECRYPT_MODE, secretKey, GCMParameterSpec(TAG_LENGTH_BITS, iv))
             cipher.doFinal(javaInput).toString(Charsets.UTF_8)
         } catch (_: AEADBadTagException) {
-            null
-        } catch (_: Exception) {
-            null
+            null   // authentication tag mismatch — wrong format or key
+        } catch (_: BadPaddingException) {
+            null   // bad padding — wrong format
+        } catch (_: IllegalBlockSizeException) {
+            null   // wrong block size
+        } catch (_: InvalidAlgorithmParameterException) {
+            null   // malformed IV
+        } catch (_: InvalidKeyException) {
+            null   // key rejected by JCE
         }
     }
 }

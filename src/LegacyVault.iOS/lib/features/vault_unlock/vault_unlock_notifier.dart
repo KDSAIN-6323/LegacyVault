@@ -49,26 +49,29 @@ class VaultUnlockNotifier extends StateNotifier<VaultUnlockState> {
         _keyStore = keyStore ?? VaultKeyStore(),
         _localAuth = localAuth ?? LocalAuthentication(),
         super(const VaultUnlockState()) {
-    _checkBiometrics();
+    _checkBiometricsAsync();
   }
 
-  Future<void> _checkBiometrics() async {
+  Future<void> _checkBiometricsAsync() async {
     try {
       final canCheck = await _localAuth.canCheckBiometrics;
       final available = await _localAuth.getAvailableBiometrics();
       state = state.copyWith(
         canUseBiometrics: canCheck && available.isNotEmpty,
       );
-    } catch (_) {}
+    } catch (_) {
+      // Biometrics not available on this device — leave canUseBiometrics false
+      state = state.copyWith(canUseBiometrics: false);
+    }
   }
 
-  Future<bool> checkBiometricEnrollment(String categoryId) async {
+  Future<bool> checkBiometricEnrollmentAsync(String categoryId) async {
     final hasKey = await _keyStore.hasKey(categoryId);
     state = state.copyWith(hasBiometricEnrolled: hasKey);
     return hasKey;
   }
 
-  Future<bool> unlockWithBiometrics(String categoryId) async {
+  Future<bool> unlockWithBiometricsAsync(String categoryId) async {
     try {
       final authenticated = await _localAuth.authenticate(
         localizedReason: 'Authenticate to unlock vault',
@@ -94,7 +97,8 @@ class VaultUnlockNotifier extends StateNotifier<VaultUnlockState> {
     }
   }
 
-  Future<bool> unlockWithPassword(String categoryId, String password) async {
+  Future<bool> unlockWithPasswordAsync(
+      String categoryId, String password) async {
     state = state.copyWith(status: UnlockStatus.loading);
     try {
       final category = await _categoryRepo.getCategoryById(categoryId);
@@ -131,7 +135,7 @@ class VaultUnlockNotifier extends StateNotifier<VaultUnlockState> {
     }
   }
 
-  Future<void> enrollBiometrics(String categoryId) async {
+  Future<void> enrollBiometricsAsync(String categoryId) async {
     if (!state.canUseBiometrics) return;
     final key = KeyCache.instance.get(categoryId);
     if (key == null) return;
@@ -148,7 +152,12 @@ class VaultUnlockNotifier extends StateNotifier<VaultUnlockState> {
         await _keyStore.storeKey(categoryId, key);
         state = state.copyWith(hasBiometricEnrolled: true);
       }
-    } catch (_) {}
+    } catch (e) {
+      state = state.copyWith(
+        status: UnlockStatus.error,
+        errorMessage: 'Failed to enroll biometrics',
+      );
+    }
   }
 
   void reset() {

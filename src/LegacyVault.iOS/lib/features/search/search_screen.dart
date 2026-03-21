@@ -52,7 +52,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       )
                     : null,
               ),
-              onChanged: (q) => notifier.search(q),
+              onChanged: (q) => notifier.searchAsync(q),
             ),
           ),
           const SizedBox(height: 8),

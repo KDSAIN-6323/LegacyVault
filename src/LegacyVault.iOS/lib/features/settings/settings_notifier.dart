@@ -35,17 +35,17 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
           inactivityMinutes: _prefs.inactivityMinutes,
         ));
 
-  Future<void> setTheme(AppTheme theme) async {
+  Future<void> setThemeAsync(AppTheme theme) async {
     await _prefs.setTheme(theme);
     state = state.copyWith(theme: theme);
   }
 
-  Future<void> setFontSize(FontSize size) async {
+  Future<void> setFontSizeAsync(FontSize size) async {
     await _prefs.setFontSize(size);
     state = state.copyWith(fontSize: size);
   }
 
-  Future<void> setInactivityMinutes(int minutes) async {
+  Future<void> setInactivityMinutesAsync(int minutes) async {
     await _prefs.setInactivityMinutes(minutes);
     state = state.copyWith(inactivityMinutes: minutes);
   }

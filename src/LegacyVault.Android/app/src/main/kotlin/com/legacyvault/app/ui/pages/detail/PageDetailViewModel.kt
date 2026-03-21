@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -81,8 +82,12 @@ class PageDetailViewModel @Inject constructor(
     // ── Load ───────────────────────────────────────────────────────────────
 
     private fun loadPage() {
+        val id = pageId ?: run {
+            _uiState.update { it.copy(isLoading = false, errorMessage = "Invalid page ID") }
+            return
+        }
         viewModelScope.launch {
-            pageRepository.observeById(pageId!!).collect { page ->
+            pageRepository.observeById(id).collectLatest { page ->
                 if (page == null) {
                     _uiState.update { it.copy(isLoading = false, errorMessage = "Page not found") }
                     return@collect
@@ -149,14 +154,18 @@ class PageDetailViewModel @Inject constructor(
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
 
             val jsonContent = serializePageContent(content)
+            val keyCopy = if (state.isEncrypted) keyCache.get(categoryId)?.copyOf() else null
             val (finalContent, finalIV) = if (state.isEncrypted) {
-                val key = keyCache.get(categoryId)
-                if (key == null) {
+                if (keyCopy == null) {
                     _uiState.update { it.copy(isSaving = false, errorMessage = "Vault is locked") }
                     return@launch
                 }
-                val result = cryptoService.encrypt(jsonContent, key)
-                result.ciphertext to result.iv
+                try {
+                    val result = cryptoService.encrypt(jsonContent, keyCopy)
+                    result.ciphertext to result.iv
+                } finally {
+                    keyCopy.fill(0)
+                }
             } else {
                 jsonContent to null
             }
@@ -175,9 +184,13 @@ class PageDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isSaving = false, isDirty = false, savedSuccessfully = true) }
                 }
             } else {
+                val id = pageId ?: run {
+                    _uiState.update { it.copy(isSaving = false, errorMessage = "Invalid page ID") }
+                    return@launch
+                }
                 pageRepository.update(
                     categoryId   = categoryId,
-                    pageId       = pageId!!,
+                    pageId       = id,
                     title        = title,
                     content      = finalContent,
                     encryptionIV = finalIV
@@ -208,10 +221,14 @@ class PageDetailViewModel @Inject constructor(
                 val page = pageRepository.observeById(target.id).first()
                     ?: error("Shopping list not found")
 
-                val rawContent = if (page.isEncrypted) {
-                    val key = keyCache.get(page.categoryId)
+                // Get a single copy of the key used for both decrypt and re-encrypt
+                val keyCopy = if (page.isEncrypted) {
+                    keyCache.get(page.categoryId)?.copyOf()
                         ?: error("\"${target.title}\" vault is locked — unlock it first")
-                    cryptoService.decrypt(page.content, page.encryptionIV ?: "", key)
+                } else null
+
+                val rawContent = if (page.isEncrypted) {
+                    cryptoService.decrypt(page.content, page.encryptionIV ?: "", keyCopy!!)
                 } else {
                     page.content
                 }
@@ -228,12 +245,15 @@ class PageDetailViewModel @Inject constructor(
                 val merged  = existing.copy(items = existing.items + newItems)
                 val newJson = serializePageContent(merged)
 
-                val (finalContent, finalIV) = if (page.isEncrypted) {
-                    val key = keyCache.get(page.categoryId)!!
-                    val result = cryptoService.encrypt(newJson, key)
-                    result.ciphertext to result.iv
-                } else {
-                    newJson to null
+                val (finalContent, finalIV) = try {
+                    if (page.isEncrypted) {
+                        val result = cryptoService.encrypt(newJson, keyCopy!!)
+                        result.ciphertext to result.iv
+                    } else {
+                        newJson to null
+                    }
+                } finally {
+                    keyCopy?.fill(0)
                 }
 
                 pageRepository.update(
@@ -244,7 +264,8 @@ class PageDetailViewModel @Inject constructor(
                     encryptionIV = finalIV
                 ).getOrThrow()
 
-                page.title
+                // Use target.title already available — no extra DB fetch needed
+                target.title
             }.onSuccess { listName ->
                 _uiState.update { it.copy(addedToListName = listName) }
             }.onFailure { e ->

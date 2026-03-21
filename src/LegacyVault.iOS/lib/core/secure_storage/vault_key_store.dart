@@ -14,7 +14,9 @@ class VaultKeyStore {
       : _storage = storage ??
             const FlutterSecureStorage(
               iOptions: IOSOptions(
-                accessibility: KeychainAccessibility.first_unlock,
+                // first_unlock_this_device prevents keys migrating to a new device
+                // via iCloud backup, keeping vault keys device-bound.
+                accessibility: KeychainAccessibility.first_unlock_this_device,
               ),
             );
 

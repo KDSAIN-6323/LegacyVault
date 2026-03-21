@@ -25,7 +25,7 @@ class _VaultUnlockScreenState extends ConsumerState<VaultUnlockScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final notifier =
           ref.read(vaultUnlockNotifierProvider(widget.categoryId).notifier);
-      final hasEnrolled = await notifier.checkBiometricEnrollment(widget.categoryId);
+      final hasEnrolled = await notifier.checkBiometricEnrollmentAsync(widget.categoryId);
       if (hasEnrolled) {
         _tryBiometric();
       }
@@ -41,7 +41,7 @@ class _VaultUnlockScreenState extends ConsumerState<VaultUnlockScreen> {
   Future<void> _tryBiometric() async {
     final notifier =
         ref.read(vaultUnlockNotifierProvider(widget.categoryId).notifier);
-    final success = await notifier.unlockWithBiometrics(widget.categoryId);
+    final success = await notifier.unlockWithBiometricsAsync(widget.categoryId);
     if (success && mounted) {
       context.pushReplacement('/vaults/${widget.categoryId}/pages');
     }
@@ -54,7 +54,7 @@ class _VaultUnlockScreenState extends ConsumerState<VaultUnlockScreen> {
     final notifier =
         ref.read(vaultUnlockNotifierProvider(widget.categoryId).notifier);
     final success =
-        await notifier.unlockWithPassword(widget.categoryId, password);
+        await notifier.unlockWithPasswordAsync(widget.categoryId, password);
 
     if (success && mounted) {
       final state = ref.read(vaultUnlockNotifierProvider(widget.categoryId));
@@ -89,7 +89,7 @@ class _VaultUnlockScreenState extends ConsumerState<VaultUnlockScreen> {
     );
 
     if (enroll == true) {
-      await notifier.enrollBiometrics(widget.categoryId);
+      await notifier.enrollBiometricsAsync(widget.categoryId);
     }
     if (mounted) {
       context.pushReplacement('/vaults/${widget.categoryId}/pages');

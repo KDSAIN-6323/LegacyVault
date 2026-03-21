@@ -22,8 +22,11 @@ class ShoppingScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () =>
-                ref.read(shoppingNotifierProvider.notifier).loadShoppingLists(),
+            onPressed: () async {
+              await ref
+                  .read(shoppingNotifierProvider.notifier)
+                  .loadShoppingListsAsync();
+            },
           ),
         ],
       ),
@@ -55,7 +58,7 @@ class _ShoppingLists extends ConsumerWidget {
           page: list.page,
           content: list.content,
           onToggleItem: (itemIndex) =>
-              notifier.toggleItem(list.page, list.content, itemIndex),
+              notifier.toggleItemAsync(list.page, list.content, itemIndex),
         );
       },
     );

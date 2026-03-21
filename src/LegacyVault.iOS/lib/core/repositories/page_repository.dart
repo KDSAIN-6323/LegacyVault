@@ -24,18 +24,18 @@ class PageRepository {
         _keyCache = keyCache ?? KeyCache.instance,
         _uuid = uuid ?? const Uuid();
 
-  Future<List<PageModel>> getPagesForCategory(String categoryId) =>
+  Future<List<PageModel>> getPagesForCategoryAsync(String categoryId) =>
       _db.getPagesByCategory(categoryId);
 
-  Future<PageModel?> getPageById(String id) => _db.getPageById(id);
+  Future<PageModel?> getPageByIdAsync(String id) => _db.getPageById(id);
 
-  Future<List<PageModel>> getPagesByType(PageType type) =>
+  Future<List<PageModel>> getPagesByTypeAsync(PageType type) =>
       _db.getPagesByType(type.dbValue);
 
-  Future<List<PageModel>> searchPages(String query) =>
+  Future<List<PageModel>> searchPagesAsync(String query) =>
       _db.searchPages(query);
 
-  Future<PageModel> createPage({
+  Future<PageModel> createPageAsync({
     required String categoryId,
     required PageType type,
     required String title,
@@ -72,7 +72,7 @@ class PageRepository {
     return page;
   }
 
-  Future<PageModel> updatePage({
+  Future<PageModel> updatePageAsync({
     required PageModel page,
     required String title,
     required PageContent content,
@@ -81,7 +81,19 @@ class PageRepository {
     bool isEncrypted = false;
     String? encryptionIv;
 
-    if (_keyCache.has(page.categoryId)) {
+    if (page.isEncrypted) {
+      // If page was encrypted but key is gone, refuse to downgrade to plaintext
+      if (!_keyCache.has(page.categoryId)) {
+        throw StateError(
+            'Cannot save "${page.title}": vault is locked. Unlock first.');
+      }
+      final key = _keyCache.get(page.categoryId)!;
+      final result = _crypto.encrypt(contentJson, key);
+      contentJson = result.ciphertext;
+      encryptionIv = result.iv;
+      isEncrypted = true;
+    } else if (_keyCache.has(page.categoryId)) {
+      // Unencrypted page in an unlocked vault — encrypt going forward
       final key = _keyCache.get(page.categoryId)!;
       final result = _crypto.encrypt(contentJson, key);
       contentJson = result.ciphertext;
@@ -100,7 +112,7 @@ class PageRepository {
     return updated;
   }
 
-  Future<void> deletePage(String id, String categoryId) =>
+  Future<void> deletePageAsync(String id, String categoryId) =>
       _db.deletePage(id, categoryId);
 
   /// Decrypt and parse content from a page. Returns null if decryption fails.
@@ -118,9 +130,9 @@ class PageRepository {
     }
   }
 
-  Future<List<PageModel>> getAllPages() => _db.getAllPages();
+  Future<List<PageModel>> getAllPagesAsync() => _db.getAllPages();
 
-  Future<void> toggleFavorite(PageModel page) async {
+  Future<void> toggleFavoriteAsync(PageModel page) async {
     await _db.updatePage(
       page.copyWith(
         isFavorite: !page.isFavorite,

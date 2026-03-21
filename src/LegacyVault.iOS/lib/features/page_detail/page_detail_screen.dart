@@ -73,7 +73,7 @@ class _PageDetailScreenState extends ConsumerState<PageDetailScreen> {
       return;
     }
 
-    final success = await notifier.savePage(
+    final success = await notifier.savePageAsync(
       title: title,
       content: _currentContent!,
     );

@@ -45,14 +45,14 @@ class PageListNotifier extends StateNotifier<PageListState> {
   })  : _pageRepo = pageRepo,
         _categoryRepo = categoryRepo,
         super(const PageListState()) {
-    loadPages();
+    loadPagesAsync();
   }
 
-  Future<void> loadPages() async {
+  Future<void> loadPagesAsync() async {
     state = state.copyWith(isLoading: true);
     try {
       final category = await _categoryRepo.getCategoryById(categoryId);
-      final pages = await _pageRepo.getPagesForCategory(categoryId);
+      final pages = await _pageRepo.getPagesForCategoryAsync(categoryId);
       state = PageListState(
         pages: pages,
         category: category,
@@ -63,19 +63,19 @@ class PageListNotifier extends StateNotifier<PageListState> {
     }
   }
 
-  Future<void> deletePage(String pageId) async {
+  Future<void> deletePageAsync(String pageId) async {
     try {
-      await _pageRepo.deletePage(pageId, categoryId);
-      await loadPages();
+      await _pageRepo.deletePageAsync(pageId, categoryId);
+      await loadPagesAsync();
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
   }
 
-  Future<void> toggleFavorite(PageModel page) async {
+  Future<void> toggleFavoriteAsync(PageModel page) async {
     try {
-      await _pageRepo.toggleFavorite(page);
-      await loadPages();
+      await _pageRepo.toggleFavoriteAsync(page);
+      await loadPagesAsync();
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }

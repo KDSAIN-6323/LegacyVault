@@ -80,7 +80,7 @@ fun RecipeEditor(
                     style    = MaterialTheme.typography.bodyMedium
                 )
                 IconButton(onClick = {
-                    onContentChange(content.copy(ingredients = content.ingredients.toMutableList().also { it.removeAt(index) }))
+                    onContentChange(content.copy(ingredients = content.ingredients.filterIndexed { i, _ -> i != index }))
                 }) {
                     Icon(Icons.Default.Close, contentDescription = "Remove ingredient")
                 }
@@ -130,7 +130,7 @@ fun RecipeEditor(
                     style    = MaterialTheme.typography.bodyMedium
                 )
                 IconButton(onClick = {
-                    onContentChange(content.copy(instructions = content.instructions.toMutableList().also { it.removeAt(index) }))
+                    onContentChange(content.copy(instructions = content.instructions.filterIndexed { i, _ -> i != index }))
                 }) {
                     Icon(Icons.Default.Close, contentDescription = "Remove step")
                 }

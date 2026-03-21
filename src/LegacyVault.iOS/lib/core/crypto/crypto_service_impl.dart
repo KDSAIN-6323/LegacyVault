@@ -89,10 +89,14 @@ class CryptoServiceImpl implements CryptoService {
     // Try mobile format first: [16-byte tag][ciphertext]
     try {
       return _decryptWithTagPrepended(wireBytes, iv, key);
-    } catch (_) {
-      // Fall back to web format: [ciphertext][16-byte tag]
+    } on ArgumentError {
+      // Wrong format (too short for mobile layout) — try web format
+      return _decryptWithTagAppended(wireBytes, iv, key);
+    } on InvalidCipherTextException {
+      // Auth tag failed for mobile format — try web format (data from web client)
       return _decryptWithTagAppended(wireBytes, iv, key);
     }
+    // Other exceptions (wrong key, corrupted data) propagate to the caller
   }
 
   String _decryptWithTagPrepended(

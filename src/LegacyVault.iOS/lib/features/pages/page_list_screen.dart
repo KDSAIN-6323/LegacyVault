@@ -78,7 +78,7 @@ class _PageList extends ConsumerWidget {
           page: summary,
           onTap: () =>
               context.push('/vaults/$categoryId/pages/${page.id}'),
-          onToggleFavorite: () => notifier.toggleFavorite(page),
+          onToggleFavorite: () => notifier.toggleFavoriteAsync(page),
           onDelete: () async {
             final confirm = await showDialog<bool>(
               context: context,
@@ -99,7 +99,7 @@ class _PageList extends ConsumerWidget {
               ),
             );
             if (confirm == true) {
-              await notifier.deletePage(page.id);
+              await notifier.deletePageAsync(page.id);
             }
           },
         );
@@ -139,7 +139,7 @@ class _PageTypePicker extends StatelessWidget {
             children: PageType.values.map((type) {
               return GestureDetector(
                 onTap: () {
-                  Navigator.of(context).pop();
+                  context.pop();
                   context.push(
                       '/vaults/$categoryId/pages/new?pageType=${type.dbValue}');
                 },

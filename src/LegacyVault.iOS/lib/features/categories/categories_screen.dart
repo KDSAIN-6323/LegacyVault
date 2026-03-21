@@ -145,7 +145,7 @@ class _CategoryTile extends ConsumerWidget {
                 onSelected: (val) async {
                   switch (val) {
                     case 'edit':
-                      showModalBottomSheet(
+                      await showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
                         backgroundColor: AppColors.darkSurface,
@@ -157,7 +157,7 @@ class _CategoryTile extends ConsumerWidget {
                             CategoryCreateEditSheet(existing: category),
                       );
                     case 'favorite':
-                      await notifier.toggleFavorite(category);
+                      await notifier.toggleFavoriteAsync(category);
                     case 'delete':
                       final confirm = await showDialog<bool>(
                         context: context,
@@ -181,7 +181,7 @@ class _CategoryTile extends ConsumerWidget {
                         ),
                       );
                       if (confirm == true) {
-                        await notifier.deleteCategory(category.id);
+                        await notifier.deleteCategoryAsync(category.id);
                       }
                   }
                 },

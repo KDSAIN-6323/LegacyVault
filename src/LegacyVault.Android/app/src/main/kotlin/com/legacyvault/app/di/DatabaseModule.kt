@@ -29,7 +29,9 @@ object DatabaseModule {
             LegacyVaultDatabase::class.java,
             LegacyVaultDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration()
+            // v1 was never shipped to production — allow destructive migration from it only.
+            // All future migrations (2→3, 3→4, …) must be added to DatabaseMigrations.kt.
+            .fallbackToDestructiveMigrationFrom(1)
             .build()
 
     @Provides @Singleton

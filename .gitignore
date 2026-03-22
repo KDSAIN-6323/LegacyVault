@@ -24,8 +24,10 @@ publish/
 .DS_Store
 Thumbs.db
 
-# Local dev database
-src/LegacyVault.API/data/
+# Local dev database (runtime files only — not source code)
+src/LegacyVault.API/data/*.db
+src/LegacyVault.API/data/*.db-shm
+src/LegacyVault.API/data/*.db-wal
 
 # Uploads (user data)
 src/LegacyVault.API/uploads/

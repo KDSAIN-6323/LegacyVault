@@ -17,7 +17,7 @@ class VaultUnlockScreen extends ConsumerStatefulWidget {
 class _VaultUnlockScreenState extends ConsumerState<VaultUnlockScreen> {
   final _passwordCtrl = TextEditingController();
   bool _obscure = true;
-  bool _enrollBiometricRequested = false;
+  final bool _enrollBiometricRequested = false;
 
   @override
   void initState() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/crypto/key_cache.dart';
 import '../../core/preferences/user_preferences.dart';
@@ -24,7 +25,7 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // Appearance section
-          _SectionHeader(title: 'Appearance'),
+          const _SectionHeader(title: 'Appearance'),
           const SizedBox(height: 8),
           _SettingsCard(
             children: [
@@ -47,7 +48,7 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // Security section
-          _SectionHeader(title: 'Security'),
+          const _SectionHeader(title: 'Security'),
           const SizedBox(height: 8),
           _SettingsCard(
             children: [
@@ -77,16 +78,16 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // About section
-          _SectionHeader(title: 'About'),
+          const _SectionHeader(title: 'About'),
           const SizedBox(height: 8),
-          _SettingsCard(
+          const _SettingsCard(
             children: [
               _SettingsTile(
                 icon: Icons.info_outline,
                 title: 'App Version',
                 subtitle: '1.0.0',
               ),
-              const Divider(height: 1),
+              Divider(height: 1),
               _SettingsTile(
                 icon: Icons.shield_outlined,
                 title: 'Encryption',

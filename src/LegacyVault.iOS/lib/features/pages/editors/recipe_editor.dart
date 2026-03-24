@@ -6,6 +6,7 @@ import '../../../core/models/page_type.dart';
 import '../../../core/repositories/page_repository.dart';
 import '../../../theme/app_colors.dart';
 import '../../pages/page_list_notifier.dart';
+import '../../../core/models/shopping_list_item.dart';
 
 class RecipeEditor extends ConsumerStatefulWidget {
   final String categoryId;
@@ -121,7 +122,7 @@ class _RecipeEditorState extends ConsumerState<RecipeEditor> {
 
   Future<void> _addIngredientsToShoppingList() async {
     final repo = ref.read(pageRepositoryProvider);
-    final shoppingPages = await repo.getPagesByType(PageType.shoppingList);
+    final shoppingPages = await repo.getPagesByTypeAsync(PageType.shoppingList);
 
     if (!mounted) return;
 
@@ -164,7 +165,7 @@ class _RecipeEditorState extends ConsumerState<RecipeEditor> {
     try {
       final parsed = repo.decryptAndParseContent(selectedPage);
       final existingContent =
-          parsed is ShoppingListContent ? parsed : ShoppingListContent(items: [], notes: '');
+          parsed is ShoppingListContent ? parsed : const ShoppingListContent(items: [], notes: '');
 
       int itemCounter = 0;
       String genId() {
@@ -180,7 +181,7 @@ class _RecipeEditorState extends ConsumerState<RecipeEditor> {
         items: [...existingContent.items, ...newItems],
       );
 
-      await repo.updatePage(
+      await repo.updatePageAsync(
         page: selectedPage,
         title: selectedPage.title,
         content: updatedContent,

@@ -5,4 +5,4 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "5000:5000"  # Swagger UI at http://localhost:5000/swagger
+      - "5500:5500"  # Swagger UI at http://localhost:5500/swagger

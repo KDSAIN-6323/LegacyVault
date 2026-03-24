@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'core/preferences/user_preferences.dart';
+import 'core/preferences/user_preferences.dart' hide AppTheme;
 import 'features/settings/settings_notifier.dart';
 import 'navigation/app_router.dart';
 import 'theme/app_theme.dart';
@@ -24,8 +24,10 @@ class LegacyVaultApp extends ConsumerWidget {
         themeMode = ThemeMode.light;
       case AppTheme.dark:
         themeMode = ThemeMode.dark;
-      case AppTheme.system:
+      default:
         themeMode = ThemeMode.system;
+      //case AppTheme.system:
+        //themeMode = ThemeMode.system;
     }
 
     return MaterialApp.router(

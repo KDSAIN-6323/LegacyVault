@@ -6,7 +6,7 @@ services:
     container_name: legacyvault_api
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
+      - ASPNETCORE_URLS=http://127.0.0.1:5500
       - JwtSettings__Secret=${JWT_SECRET}
       - JwtSettings__Issuer=LegacyVault
       - JwtSettings__Audience=LegacyVaultClients
@@ -20,7 +20,7 @@ services:
       - legacyvault_net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:5000/api/auth/health || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5500/api/auth/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5

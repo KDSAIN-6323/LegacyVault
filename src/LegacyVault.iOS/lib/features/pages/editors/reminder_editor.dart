@@ -147,7 +147,7 @@ class _ReminderEditorState extends State<ReminderEditor> {
         ),
         const SizedBox(height: 14),
         DropdownButtonFormField<String>(
-          value: _recurrence,
+          initialValue: _recurrence,
           decoration: const InputDecoration(
             labelText: 'Recurrence',
             prefixIcon: Icon(Icons.repeat),
@@ -197,7 +197,7 @@ class _ReminderEditorState extends State<ReminderEditor> {
               Expanded(
                 flex: 3,
                 child: DropdownButtonFormField<String>(
-                  value: _notifyUnit,
+                  initialValue: _notifyUnit,
                   decoration: const InputDecoration(labelText: 'Unit'),
                   items: _notifyUnitOptions
                       .map((u) => DropdownMenuItem(value: u, child: Text(u)))

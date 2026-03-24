@@ -91,10 +91,10 @@ class _ShoppingListCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.darkCard,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-              border: const Border(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+              border: Border(
                 top: BorderSide(color: AppColors.accent, width: 2),
                 left: BorderSide(color: AppColors.darkDivider),
                 right: BorderSide(color: AppColors.darkDivider),

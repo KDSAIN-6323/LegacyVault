@@ -7,7 +7,6 @@ class AppTheme {
   static ThemeData dark({double fontScaleFactor = 1.0}) {
     final base = ThemeData.dark();
     return base.copyWith(
-      useMaterial3: true,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.accent,
         secondary: AppColors.accentLight,
@@ -25,7 +24,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: false,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.darkCard,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -102,7 +101,6 @@ class AppTheme {
   static ThemeData light({double fontScaleFactor = 1.0}) {
     final base = ThemeData.light();
     return base.copyWith(
-      useMaterial3: true,
       colorScheme: const ColorScheme.light(
         primary: AppColors.accent,
         secondary: AppColors.accentDark,
@@ -120,7 +118,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: false,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.lightSurface,
         elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

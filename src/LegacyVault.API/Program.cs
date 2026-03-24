@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseUrls("http://0.0.0.0:8080");
+
 // Database — resolve relative Data Source paths against ContentRootPath so the
 // database location is stable regardless of the process working directory.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

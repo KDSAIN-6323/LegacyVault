@@ -173,12 +173,12 @@ class _ReminderCard extends StatelessWidget {
                       ),
                       if (content.recurrence != 'NONE') ...[
                         const SizedBox(width: 8),
-                        const Icon(Icons.repeat, size: 13, color: AppColors.accentLight),
+                        const Icon(Icons.repeat, size: 14, color: AppColors.accentLight),
                         const SizedBox(width: 2),
                         Text(
                           content.recurrence,
                           style: const TextStyle(
-                              fontSize: 11, color: AppColors.accentLight),
+                              fontSize: 12, color: AppColors.accentLight),
                         ),
                       ],
                     ],
@@ -195,7 +195,7 @@ class _ReminderCard extends StatelessWidget {
                       child: Text(
                         content.tag,
                         style: const TextStyle(
-                            fontSize: 11, color: AppColors.accentLight),
+                            fontSize: 12, color: AppColors.accentLight),
                       ),
                     ),
                   ],
@@ -206,14 +206,14 @@ class _ReminderCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withAlpha(40),
+                  color: AppColors.error,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
                   'OVERDUE',
                   style: TextStyle(
-                      fontSize: 10,
-                      color: AppColors.error,
+                      fontSize: 12,
+                      color: AppColors.darkBackground,
                       fontWeight: FontWeight.bold),
                 ),
               )
@@ -221,14 +221,14 @@ class _ReminderCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withAlpha(40),
+                  color: AppColors.warning,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
                   'TODAY',
                   style: TextStyle(
-                      fontSize: 10,
-                      color: AppColors.warning,
+                      fontSize: 12,
+                      color: AppColors.darkBackground,
                       fontWeight: FontWeight.bold),
                 ),
               ),

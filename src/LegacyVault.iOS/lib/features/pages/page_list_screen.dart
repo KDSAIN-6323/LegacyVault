@@ -126,7 +126,7 @@ class _PageTypePicker extends StatelessWidget {
             style: Theme.of(context)
                 .textTheme
                 .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold),
+                ?.copyWith(fontWeight: FontWeight.bold, color: AppColors.darkOnBackground),
           ),
           const SizedBox(height: 16),
           GridView.count(
@@ -157,7 +157,7 @@ class _PageTypePicker extends StatelessWidget {
                       Text(
                         type.label,
                         style: const TextStyle(
-                            fontSize: 11, color: AppColors.darkOnSurface),
+                            fontSize: 12, color: AppColors.darkOnSurface),
                         textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,

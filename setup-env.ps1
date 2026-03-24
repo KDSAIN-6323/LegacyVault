@@ -7,7 +7,8 @@
 #   pwsh ./setup-env.ps1 -VaultDir /custom/path
 
 param(
-    [string]$VaultDir = ""
+    [string]$VaultDir = "",
+    [int]$ApiPort = 0
 )
 
 $EnvFile = Join-Path $PSScriptRoot ".env"
@@ -29,6 +30,12 @@ $VaultDir = $VaultDir.TrimEnd('/', '\')
 
 $UploadsPath = "$VaultDir/uploads"
 $BackupsPath = "$VaultDir/backups"
+
+# ── Resolve API host port ─────────────────────────────────────────────────────
+if ($ApiPort -eq 0) {
+    # Default 5000; collaborators can override if that port is taken locally
+    $ApiPort = 5000
+}
 
 # ── Read existing .env or seed from .env.example ──────────────────────────────
 if (Test-Path $EnvFile) {
@@ -68,6 +75,7 @@ function Set-EnvKey {
 
 $lines = Set-EnvKey -Lines $lines -Key "VAULT_UPLOADS_PATH" -Value $UploadsPath
 $lines = Set-EnvKey -Lines $lines -Key "VAULT_BACKUPS_PATH" -Value $BackupsPath
+$lines = Set-EnvKey -Lines $lines -Key "API_PORT"           -Value $ApiPort
 
 # ── Write result ──────────────────────────────────────────────────────────────
 $lines | Set-Content $EnvFile -Encoding UTF8
@@ -76,3 +84,4 @@ Write-Host ""
 Write-Host "Done. .env written with:"
 Write-Host "  VAULT_UPLOADS_PATH=$UploadsPath"
 Write-Host "  VAULT_BACKUPS_PATH=$BackupsPath"
+Write-Host "  API_PORT=$ApiPort"

@@ -1,0 +1,216 @@
+/* ─── Overlay ─────────────────────────────────────────────────────────────── */
+
+.adv-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: adv-fade-in 0.15s ease;
+}
+
+@keyframes adv-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Terminal window ─────────────────────────────────────────────────────── */
+
+.adv-terminal {
+  width: min(820px, 96vw);
+  height: min(88vh, 680px);
+  background: #080e08;
+  border: 1.5px solid #26c226;
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(38, 194, 38, 0.12),
+    0 0 30px rgba(38, 194, 38, 0.10),
+    0 0 80px rgba(38, 194, 38, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+  animation: adv-slide-up 0.2s ease;
+}
+
+@keyframes adv-slide-up {
+  from { transform: translateY(10px); opacity: 0.8; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* CRT scanlines */
+.adv-terminal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.10) 3px,
+    rgba(0, 0, 0, 0.10) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Soft vignette */
+.adv-terminal::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+  pointer-events: none;
+  z-index: 11;
+}
+
+/* ─── Title bar ───────────────────────────────────────────────────────────── */
+
+.adv-titlebar {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background: #26c226;
+  color: #080e08;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  position: relative;
+  z-index: 12;
+}
+
+.adv-close {
+  background: none;
+  border: none;
+  color: #080e08;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 2px;
+  letter-spacing: 0;
+  opacity: 0.75;
+  transition: opacity 0.1s;
+}
+
+.adv-close:hover {
+  opacity: 1;
+}
+
+/* ─── Output area ─────────────────────────────────────────────────────────── */
+
+.adv-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 18px 6px;
+  color: #2dde2d;
+  font-size: 13px;
+  line-height: 1.65;
+  scrollbar-width: thin;
+  scrollbar-color: #1a8c1a #080e08;
+}
+
+.adv-output::-webkit-scrollbar {
+  width: 5px;
+}
+.adv-output::-webkit-scrollbar-track {
+  background: #080e08;
+}
+.adv-output::-webkit-scrollbar-thumb {
+  background: #1a6c1a;
+  border-radius: 3px;
+}
+
+/* ─── Output lines ────────────────────────────────────────────────────────── */
+
+.adv-line {
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.adv-blank {
+  height: 0.55em;
+}
+
+.adv-line--heading {
+  color: #e8ffe8;
+  letter-spacing: 0.03em;
+}
+
+.adv-line--win {
+  color: #a78bfa;
+  text-shadow: 0 0 10px rgba(167, 139, 250, 0.35);
+}
+
+.adv-line--error {
+  color: #ff7070;
+}
+
+.adv-line--dim {
+  color: #1c9c1c;
+}
+
+.adv-line--cmd {
+  color: #4ade80;
+  opacity: 0.55;
+}
+
+/* ─── Input row ───────────────────────────────────────────────────────────── */
+
+.adv-input-row {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 8px 18px;
+  border-top: 1px solid rgba(38, 194, 38, 0.22);
+  gap: 8px;
+  position: relative;
+  z-index: 12;
+}
+
+.adv-prompt {
+  color: #26c226;
+  font-size: 13px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.adv-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: #2dde2d;
+  font-family: inherit;
+  font-size: 13px;
+  caret-color: #2dde2d;
+  line-height: 1;
+}
+
+.adv-input::placeholder {
+  color: rgba(45, 222, 45, 0.22);
+  font-style: italic;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .adv-output {
+    font-size: 12px;
+    padding: 10px 12px 4px;
+  }
+  .adv-input {
+    font-size: 12px;
+  }
+  .adv-input-row {
+    padding: 7px 12px;
+  }
+}
